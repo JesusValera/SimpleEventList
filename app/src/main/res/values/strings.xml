@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Event List</string>
+    <string name="create_event">Create Event</string>
+</resources>
