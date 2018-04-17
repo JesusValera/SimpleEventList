@@ -15,7 +15,6 @@ import android.support.design.widget.TabLayout
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.Toolbar
-import android.widget.Toast
 import com.rad4m.jesusreales.simpleeventlist.adapter.SampleAdapter
 import java.text.SimpleDateFormat
 import java.util.*
@@ -25,7 +24,6 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener {
     lateinit var events: ArrayList<Event>
     val INTENT_FOR_RESULT = 1
     private val pictures = arrayListOf(R.drawable.comp0, R.drawable.comp1, R.drawable.comp2, R.drawable.comp3)
-    // notifyDataSetChanged.
 
     fun test() {
         /*val numbersArray = Array(5, { j -> j * 2 })
@@ -118,6 +116,11 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener {
 
         "test".upperCaseFirstLetter()
 
+        Log.w("AREA 3.0", "" + circleOperation(3.0, ::calArea))
+        circleOperation(3.0, {
+            it * it
+        })
+
     }
 
     fun String.upperCaseFirstLetter(): String {
@@ -133,6 +136,15 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener {
         val area = "%.2f".format(calArea())
 
         Log.w("CIRCUMFERENCE", "The circumference is $circumference and the area is $area")
+    }
+
+    fun calCircumference(radius: Double) = (2 * Math.PI) * radius
+
+    fun calArea(radius: Double): Double = (Math.PI) * Math.pow(radius, 2.0)
+
+    fun circleOperation(radius: Double, op: (Double) -> Double): Double {
+        val result = op(radius)
+        return result
     }
 
     private fun initToolbar() {

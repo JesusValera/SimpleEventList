@@ -1,11 +1,10 @@
 package com.rad4m.jesusreales.simpleeventlist.model
 
 import android.graphics.drawable.Drawable
-import com.rad4m.jesusreales.simpleeventlist.R
 import java.util.*
 
 // https://code.tutsplus.com/series/kotlin-from-scratch--cms-1209
-// https://code.tutsplus.com/tutorials/kotlin-from-scratch-ranges-and-collections--cms-29397 -- Collections Operation Functions
+// https://code.tutsplus.com/tutorials/kotlin-from-scratch-advanced-functions--cms-29534 -- Higher-Order Functions
 // https://try.kotlinlang.org/#/Kotlin%20Koans/Introduction/Nullable%20types/Task.kt
 
 class Event(var name: String) : Comparable<Event> {
