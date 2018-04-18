@@ -4,21 +4,22 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import com.rad4m.jesusreales.simpleeventlist.MainActivity
 import com.rad4m.jesusreales.simpleeventlist.R
 import com.rad4m.jesusreales.simpleeventlist.adapter.EventAdapter
 import com.rad4m.jesusreales.simpleeventlist.dialog.EventOptions
-import com.rad4m.jesusreales.simpleeventlist.model.Event
-import java.util.ArrayList
+import com.rad4m.jesusreales.simpleeventlist.model.CellElement
+import java.util.*
 
 class FutureEvents : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var events: ArrayList<Event>
 
     companion object {
         fun newInstance(): FutureEvents = FutureEvents()
@@ -26,20 +27,20 @@ class FutureEvents : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_future_events, container, false)
+        val view = inflater.inflate(R.layout.fragment_with_events, container, false)
 
         recyclerView = view.findViewById(R.id.rvEvents)
-        events = ArrayList()
-
         recyclerView.setHasFixedSize(true)
 
-        val adapter = EventAdapter(context!!, events)
+        val adapter = EventAdapter(view.context, selectFutureEvents())
+
         adapter.setOnLongClickListener(View.OnLongClickListener {
             val position = recyclerView.getChildAdapterPosition(it)
             val event = adapter.getEventByPos(position)
             val eventOption = EventOptions()
-            eventOption.setEvent(event)
-            eventOption.show(activity!!.fragmentManager, "tag")
+            eventOption.setEvent(event!!)
+            val activity = activity as MainActivity
+            eventOption.show(activity.fragmentManager, "tag")
 
             return@OnLongClickListener true
         })
@@ -53,6 +54,30 @@ class FutureEvents : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
         return view
+    }
+
+    private fun selectFutureEvents() : ArrayList<CellElement> {
+        val cellFilter = arrayListOf<CellElement>()
+        val activity = activity as MainActivity
+        val cells = activity.cellElements
+        cells.sort()
+
+        for (i in cells.indices) {
+            if (DateUtils.isToday(cells[i].event!!.date.time)) {
+                cellFilter.add(cells[i])
+                continue
+            }
+            if (cells[i].event!!.date.after(Date(System.currentTimeMillis()))) {
+                cellFilter.add(cells[i])
+            }
+        }
+
+        return cellFilter
+    }
+
+    override fun onStart() {
+        super.onStart()
+        recyclerView.adapter.notifyDataSetChanged()
     }
 
 }

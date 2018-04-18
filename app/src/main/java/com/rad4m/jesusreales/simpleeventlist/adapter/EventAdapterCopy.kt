@@ -1,0 +1,85 @@
+package com.rad4m.jesusreales.simpleeventlist.adapter
+
+import android.content.Context
+import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import com.rad4m.jesusreales.simpleeventlist.R
+import com.rad4m.jesusreales.simpleeventlist.model.Event
+import java.text.SimpleDateFormat
+import java.util.*
+import android.content.Intent
+import android.net.Uri
+import java.text.ParseException
+
+class EventAdapterCopy(var context: Context, var events: List<Event>) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), View.OnLongClickListener {
+
+    private lateinit var listener: View.OnLongClickListener
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventsViewHolder {
+        val itemView: View = LayoutInflater.from(parent.context).inflate(R.layout.cardview_event, parent, false)
+        itemView.setOnLongClickListener(this)
+
+        return EventsViewHolder(context, itemView)
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val event: Event = events[position]
+
+        holder as EventsViewHolder
+        holder.bindEvent(event)
+    }
+
+    override fun getItemCount(): Int {
+        return events.size
+    }
+
+    fun getEventByPos(position: Int): Event {
+        return events[position]
+    }
+
+    override fun onLongClick(v: View?): Boolean {
+        return listener.onLongClick(v)
+    }
+
+    fun setOnLongClickListener(listener: View.OnLongClickListener) {
+        this.listener = listener
+    }
+
+    class EventsViewHolder constructor(private var context: Context, itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+        private val ivPicture: ImageView? = itemView.findViewById(R.id.ivPicture)
+        private val tvLocation: TextView = itemView.findViewById(R.id.tvLocation)
+        private val tvName: TextView = itemView.findViewById(R.id.tvName)
+        private val tvDate: TextView = itemView.findViewById(R.id.tvDate)
+        private val tvTime: TextView = itemView.findViewById(R.id.tvTime)
+
+        fun bindEvent(event: Event) {
+            tvName.text = event.name
+            tvLocation.text = event.location
+            ivPicture?.setImageDrawable(event.picture)
+            tvTime.text = event.time
+
+            try {
+                val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                tvDate.text = sdf.format(event.date)
+            } catch (e : ParseException) {
+
+            }
+
+            tvLocation.setOnClickListener {
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = Uri.parse("http://maps.google.com/maps?q=${event.location}")
+
+                if (intent.resolveActivity(context.packageManager) != null) {
+                    context.startActivity(intent)
+                }
+            }
+        }
+
+    }
+
+}

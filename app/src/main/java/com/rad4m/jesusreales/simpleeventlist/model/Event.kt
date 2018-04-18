@@ -7,11 +7,11 @@ import java.util.*
 // https://code.tutsplus.com/tutorials/kotlin-from-scratch-advanced-functions--cms-29534 -- Higher-Order Functions
 // https://try.kotlinlang.org/#/Kotlin%20Koans/Introduction/Nullable%20types/Task.kt
 
-class Event(var name: String) : Comparable<Event> {
+class Event(var name: String) {
 
     var location: String = ""
     var picture: Drawable? = null
-    var date: Calendar = Calendar.getInstance()
+    var date: Date = Date()
     var time: String = ""
 
     fun addEvent(events: ArrayList<Event>) {
@@ -25,7 +25,5 @@ class Event(var name: String) : Comparable<Event> {
             events.remove(this)
         }
     }
-
-    override fun compareTo(other: Event): Int = if (this.date.after(other.date)) { 1 } else { -1 }
 
 }

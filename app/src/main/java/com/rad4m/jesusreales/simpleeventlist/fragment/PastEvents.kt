@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,33 +14,33 @@ import com.rad4m.jesusreales.simpleeventlist.MainActivity
 import com.rad4m.jesusreales.simpleeventlist.R
 import com.rad4m.jesusreales.simpleeventlist.adapter.EventAdapter
 import com.rad4m.jesusreales.simpleeventlist.dialog.EventOptions
-import com.rad4m.jesusreales.simpleeventlist.model.Event
-import java.util.ArrayList
+import com.rad4m.jesusreales.simpleeventlist.model.CellElement
+import java.util.*
 
 class PastEvents : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var events: ArrayList<Event>
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+    companion object {
+        fun newInstance(): PastEvents = PastEvents()
+    }
+
+    override fun
+        onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_future_events, container, false)
+        val view = inflater.inflate(R.layout.fragment_with_events, container, false)
 
-        val activity = activity as MainActivity
-        events = activity.events
         recyclerView = view.findViewById(R.id.rvEvents)
         recyclerView.setHasFixedSize(true)
-        val adapter = EventAdapter(view.context, events)
 
-        if (adapter.itemCount == 0) {
-            recyclerView.setBackgroundResource(R.drawable.ic_inbox_black_24dp)
-        }
+        val adapter = EventAdapter(view.context, selectPastEvents())
 
         adapter.setOnLongClickListener(View.OnLongClickListener {
             val position = recyclerView.getChildAdapterPosition(it)
             val event = adapter.getEventByPos(position)
             val eventOption = EventOptions()
-            eventOption.setEvent(event)
+            eventOption.setEvent(event!!)
+            val activity = activity as MainActivity
             eventOption.show(activity.fragmentManager, "tag")
 
             return@OnLongClickListener true
@@ -56,12 +57,28 @@ class PastEvents : Fragment() {
         return view
     }
 
-    companion object {
-        fun newInstance(): PastEvents = PastEvents()
+    private fun selectPastEvents() : ArrayList<CellElement> {
+        val cellFilter = arrayListOf<CellElement>()
+        val activity = activity as MainActivity
+        val cells = activity.cellElements
+        cells.sortDescending()
+
+        for (i in cells.indices) {
+            if (DateUtils.isToday(cells[i].event!!.date.time)) {
+                cellFilter.add(cells[i])
+                continue
+            }
+            if (cells[i].event!!.date.before(Date(System.currentTimeMillis()))) {
+                cellFilter.add(cells[i])
+            }
+        }
+
+        return cellFilter
     }
 
     override fun onStart() {
         super.onStart()
         recyclerView.adapter.notifyDataSetChanged()
     }
+
 }
