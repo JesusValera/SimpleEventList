@@ -5,7 +5,6 @@ import android.app.Dialog
 import android.app.DialogFragment
 import android.app.TimePickerDialog
 import android.os.Bundle
-import android.text.format.DateFormat
 import android.widget.TimePicker
 import java.util.*
 
@@ -19,15 +18,15 @@ class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSetListener 
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
 
-        return TimePickerDialog(activity, this, hour, minute, DateFormat.is24HourFormat(activity))
+        return TimePickerDialog(activity, this, hour, minute, true)
     }
 
     override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
-        mListener.onSelectedDate(this, hourOfDay, minute)
+        mListener.onSelectedDate(this, hourOfDay, minute, tag)
     }
 
     interface DateDialogListener {
-        fun onSelectedDate(dialog: DialogFragment, hourOfDay: Int, minute: Int)
+        fun onSelectedDate(dialog: DialogFragment, hourOfDay: Int, minute: Int, tag: String)
     }
 
     override fun onAttach(activity: Activity) {

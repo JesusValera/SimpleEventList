@@ -16,32 +16,50 @@ import com.rad4m.jesusreales.simpleeventlist.adapter.EventAdapter
 import com.rad4m.jesusreales.simpleeventlist.dialog.EventOptions
 import com.rad4m.jesusreales.simpleeventlist.model.CellElement
 import java.util.*
+import kotlin.collections.ArrayList
 
 class PastEvents : Fragment() {
 
-    private lateinit var recyclerView: RecyclerView
+    lateinit var recyclerView: RecyclerView
+    lateinit var adapter: EventAdapter
 
     companion object {
         fun newInstance(): PastEvents = PastEvents()
     }
 
-    override fun
-        onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    private fun selectPastEvents(): ArrayList<CellElement> {
+        val activity = activity as MainActivity
+        val cells = activity.cellElements
+        val cellFilter = arrayListOf<CellElement>()
+        cells.sortDescending()
+
+        for (i in cells.indices) {
+            /*if (DateUtils.isToday(cells[i].event!!.date.time)) {
+                cellFilter.add(cells[i])
+                continue
+            }*/
+            if (cells[i].event!!.date.before(Date(System.currentTimeMillis()))) {
+                cellFilter.add(cells[i])
+            }
+        }
+
+        return cellFilter
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_with_events, container, false)
 
         recyclerView = view.findViewById(R.id.rvEvents)
         recyclerView.setHasFixedSize(true)
 
-        val adapter = EventAdapter(view.context, selectPastEvents())
+        adapter = EventAdapter(view.context, selectPastEvents())
 
         adapter.setOnLongClickListener(View.OnLongClickListener {
             val position = recyclerView.getChildAdapterPosition(it)
-            val event = adapter.getEventByPos(position)
+            val element = adapter.getEventByPos(position)
             val eventOption = EventOptions()
-            eventOption.setEvent(event!!)
-            val activity = activity as MainActivity
-            eventOption.show(activity.fragmentManager, "tag")
+            eventOption.setCellElement(element)
+            eventOption.show(activity?.fragmentManager, "tag")
 
             return@OnLongClickListener true
         })
@@ -57,28 +75,31 @@ class PastEvents : Fragment() {
         return view
     }
 
-    private fun selectPastEvents() : ArrayList<CellElement> {
-        val cellFilter = arrayListOf<CellElement>()
-        val activity = activity as MainActivity
-        val cells = activity.cellElements
-        cells.sortDescending()
-
-        for (i in cells.indices) {
-            if (DateUtils.isToday(cells[i].event!!.date.time)) {
-                cellFilter.add(cells[i])
-                continue
-            }
-            if (cells[i].event!!.date.before(Date(System.currentTimeMillis()))) {
-                cellFilter.add(cells[i])
-            }
-        }
-
-        return cellFilter
+    override fun onResume() {
+        recreateAdapter()
+        super.onResume()
     }
 
-    override fun onStart() {
-        super.onStart()
-        recyclerView.adapter.notifyDataSetChanged()
+    fun recreateAdapter() {
+        val activity = activity as MainActivity
+        adapter = EventAdapter(context!!, selectPastEvents())
+        adapter.setOnLongClickListener(View.OnLongClickListener {
+            val position = recyclerView.getChildAdapterPosition(it)
+            val element = adapter.getEventByPos(position)
+            val eventOption = EventOptions()
+            eventOption.setCellElement(element)
+            eventOption.show(activity.fragmentManager, "tag")
+
+            return@OnLongClickListener true
+        })
+
+        if (adapter.itemCount != 0) {
+            view?.findViewById<ImageView>(R.id.ivRecyclerViewEmpty)?.visibility = View.INVISIBLE
+            view?.findViewById<TextView>(R.id.tvRecyclerViewEmpty)?.visibility = View.INVISIBLE
+        }
+
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
     }
 
 }

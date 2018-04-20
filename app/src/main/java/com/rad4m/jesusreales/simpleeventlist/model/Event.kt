@@ -12,18 +12,7 @@ class Event(var name: String) {
     var location: String = ""
     var picture: Drawable? = null
     var date: Date = Date()
-    var time: String = ""
-
-    fun addEvent(events: ArrayList<Event>) {
-        // Check ID or some to avoid repeated events?
-        events += this
-    }
-
-    fun removeEvent(events: ArrayList<Event>) {
-        // TODO I think that it doesnt work... yet. (comparator?)
-        if (events.contains(this)) {
-            events.remove(this)
-        }
-    }
+    var startTime: String = ""
+    var endTime: String = ""
 
 }

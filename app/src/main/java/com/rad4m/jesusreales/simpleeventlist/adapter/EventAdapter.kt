@@ -14,7 +14,6 @@ import java.util.*
 import android.content.Intent
 import android.net.Uri
 import com.rad4m.jesusreales.simpleeventlist.model.CellElement
-import java.text.ParseException
 
 class EventAdapter(var context: Context, cellElements: ArrayList<CellElement>) : RecyclerView.Adapter<EventAdapter.EventsViewHolder>(), View.OnLongClickListener {
 
@@ -25,27 +24,30 @@ class EventAdapter(var context: Context, cellElements: ArrayList<CellElement>) :
         return sdf.format(event.date)
     }
 
-    private fun isToday(dateString: String) : String {
+    private fun isToday(dateString: String): String {
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val today = sdf.format(Date(System.currentTimeMillis()))
         val yesterday = sdf.format(Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000))
         val tomorrow = sdf.format(Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000))
 
-        return when(dateString) {
+        return when (dateString) {
             today -> "Today"
             yesterday -> "Yesterday"
             tomorrow -> "Tomorrow"
-            else -> dateString
+            else -> {
+                val d = sdf.parse(dateString)
+                sdf.applyPattern("dd MMM yyyy")
+                return sdf.format(d)
+            }
         }
     }
 
     private fun createDividers(cellElements: ArrayList<CellElement>) {
-        //cellElements.sort()
         val cellEventsAndDividers: ArrayList<CellElement> = arrayListOf()
 
         for (i in cellElements.indices) {
 
-            if (cellEventsAndDividers.size == 0) {
+            /*if (cellEventsAndDividers.size == 0) {
                 val date = isToday(formatDate(cellElements[i].event!!))
                 val divider = CellElement(date)
 
@@ -60,6 +62,14 @@ class EventAdapter(var context: Context, cellElements: ArrayList<CellElement>) :
                     cellEventsAndDividers.add(divider)
                 }
 
+            cellEventsAndDividers.add(cellElements[i])*/
+
+            // Add divider.
+            val date = isToday(formatDate(cellElements[i].event!!))
+            val divider = CellElement(date)
+            cellEventsAndDividers.add(divider)
+
+            // Add event.
             cellEventsAndDividers.add(cellElements[i])
         }
 
@@ -102,8 +112,8 @@ class EventAdapter(var context: Context, cellElements: ArrayList<CellElement>) :
         return cellElements.size
     }
 
-    fun getEventByPos(position: Int): Event? {
-        return cellElements[position].event
+    fun getEventByPos(position: Int): CellElement {
+        return cellElements[position]
     }
 
     override fun onLongClick(v: View?): Boolean {
@@ -122,22 +132,15 @@ class EventAdapter(var context: Context, cellElements: ArrayList<CellElement>) :
                 val ivPicture: ImageView? = itemView.findViewById(R.id.ivPicture)
                 val tvLocation: TextView = itemView.findViewById(R.id.tvLocation)
                 val tvName: TextView = itemView.findViewById(R.id.tvName)
-                val tvDate: TextView = itemView.findViewById(R.id.tvDate)
-                val tvTime: TextView = itemView.findViewById(R.id.tvTime)
+                val tvStartTime: TextView = itemView.findViewById(R.id.tvStartTime)
+                val tvEndTime: TextView = itemView.findViewById(R.id.tvEndTime)
 
-                // Event.
                 val event = cellElement.event
                 tvName.text = event?.name
                 tvLocation.text = event?.location
                 ivPicture?.setImageDrawable(event?.picture)
-                tvTime.text = event?.time
-
-                try {
-                    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                    tvDate.text = sdf.format(event?.date)
-                } catch (e: ParseException) {
-
-                }
+                tvStartTime.text = event?.startTime
+                tvEndTime.text = event?.endTime
 
                 tvLocation.setOnClickListener {
                     val intent = Intent(Intent.ACTION_VIEW)
@@ -155,7 +158,6 @@ class EventAdapter(var context: Context, cellElements: ArrayList<CellElement>) :
             }
 
         }
-
     }
 
     init {

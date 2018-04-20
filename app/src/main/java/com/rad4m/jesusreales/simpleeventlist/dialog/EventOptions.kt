@@ -5,37 +5,38 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import android.app.Activity
+import com.rad4m.jesusreales.simpleeventlist.model.CellElement
 import com.rad4m.jesusreales.simpleeventlist.model.Event
 
 class EventOptions : DialogFragment() {
 
     private lateinit var mListener: DialogEventListener
-    private lateinit var event: Event
+    private lateinit var cellElement: CellElement
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val items = arrayOf("Add event to calendar", "Update event", "Delete event")
 
         val builder = AlertDialog.Builder(activity)
-        builder.setTitle("What do you want to do? (${event.name})")
-                .setItems(items) { dialog, item ->
+        builder.setTitle("What do you want to do? (${cellElement.event?.name})")
+                .setItems(items) { _, item ->
                     when (item) {
-                        0 -> mListener.onDialogAddToCalendar(this, event)
-                        1 -> mListener.onDialogUpdate(this, event)
-                        2 -> mListener.onDialogDelete(this, event)
+                        0 -> mListener.onDialogAddToCalendar(this, cellElement)
+                        1 -> mListener.onDialogUpdate(this, cellElement)
+                        2 -> mListener.onDialogDelete(this, cellElement)
                     }
                 }
         //builder.show()
         return builder.create()
     }
 
-    fun setEvent(event: Event) {
-        this.event = event
+    fun setCellElement(cellElement: CellElement) {
+        this.cellElement = cellElement
     }
 
     interface DialogEventListener {
-        fun onDialogAddToCalendar(dialog: DialogFragment, event: Event)
-        fun onDialogUpdate(dialog: DialogFragment, event: Event)
-        fun onDialogDelete(dialog: DialogFragment, event: Event)
+        fun onDialogAddToCalendar(dialog: DialogFragment, cellElement: CellElement)
+        fun onDialogUpdate(dialog: DialogFragment, cellElement: CellElement)
+        fun onDialogDelete(dialog: DialogFragment, cellElement: CellElement)
     }
 
     override fun onAttach(activity: Activity) {

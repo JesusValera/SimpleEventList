@@ -19,6 +19,7 @@ import java.util.*
 
 class FutureEvents : Fragment() {
 
+    lateinit var adapter: EventAdapter
     private lateinit var recyclerView: RecyclerView
 
     companion object {
@@ -32,13 +33,13 @@ class FutureEvents : Fragment() {
         recyclerView = view.findViewById(R.id.rvEvents)
         recyclerView.setHasFixedSize(true)
 
-        val adapter = EventAdapter(view.context, selectFutureEvents())
+        adapter = EventAdapter(view.context, selectFutureEvents())
 
         adapter.setOnLongClickListener(View.OnLongClickListener {
             val position = recyclerView.getChildAdapterPosition(it)
-            val event = adapter.getEventByPos(position)
+            val element = adapter.getEventByPos(position)
             val eventOption = EventOptions()
-            eventOption.setEvent(event!!)
+            eventOption.setCellElement(element)
             val activity = activity as MainActivity
             eventOption.show(activity.fragmentManager, "tag")
 
@@ -63,10 +64,10 @@ class FutureEvents : Fragment() {
         cells.sort()
 
         for (i in cells.indices) {
-            if (DateUtils.isToday(cells[i].event!!.date.time)) {
+            /*if (DateUtils.isToday(cells[i].event!!.date.time)) {
                 cellFilter.add(cells[i])
                 continue
-            }
+            }*/
             if (cells[i].event!!.date.after(Date(System.currentTimeMillis()))) {
                 cellFilter.add(cells[i])
             }
@@ -75,9 +76,31 @@ class FutureEvents : Fragment() {
         return cellFilter
     }
 
-    override fun onStart() {
-        super.onStart()
-        recyclerView.adapter.notifyDataSetChanged()
+    override fun onResume() {
+        recreateAdapter()
+        super.onResume()
+    }
+
+    fun recreateAdapter() {
+        val activity = activity as MainActivity
+        adapter = EventAdapter(context!!, selectFutureEvents())
+        adapter.setOnLongClickListener(View.OnLongClickListener {
+            val position = recyclerView.getChildAdapterPosition(it)
+            val element = adapter.getEventByPos(position)
+            val eventOption = EventOptions()
+            eventOption.setCellElement(element)
+            eventOption.show(activity.fragmentManager, "tag")
+
+            return@OnLongClickListener true
+        })
+
+        if (adapter.itemCount != 0) {
+            view?.findViewById<ImageView>(R.id.ivRecyclerViewEmpty)?.visibility = View.INVISIBLE
+            view?.findViewById<TextView>(R.id.tvRecyclerViewEmpty)?.visibility = View.INVISIBLE
+        }
+
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
     }
 
 }
