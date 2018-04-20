@@ -37,13 +37,29 @@ class PastEvents : Fragment() {
             /*if (DateUtils.isToday(cells[i].event!!.date.time)) {
                 cellFilter.add(cells[i])
                 continue
-            }*/
+            }
+
             if (cells[i].event!!.date.before(Date(System.currentTimeMillis()))) {
+                cellFilter.add(cells[i])
+            }*/
+            val date = returnCompleteDate(cells[i].event!!.date,
+                    cells[i].event!!.startTime.subSequence(0, 2).toString().toInt(),
+                    cells[i].event!!.startTime.subSequence(3, 5).toString().toInt())
+            if (date.timeInMillis < System.currentTimeMillis()) {
                 cellFilter.add(cells[i])
             }
         }
 
         return cellFilter
+    }
+
+    private fun returnCompleteDate(date: Date, hours: Int, minutes: Int) : Calendar {
+        val cal: Calendar = GregorianCalendar()
+        cal.time = date
+        cal.add(Calendar.HOUR, hours)
+        cal.add(Calendar.MINUTE, minutes)
+
+        return cal
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -67,6 +83,9 @@ class PastEvents : Fragment() {
         if (adapter.itemCount != 0) {
             view.findViewById<ImageView>(R.id.ivRecyclerViewEmpty).visibility = View.INVISIBLE
             view.findViewById<TextView>(R.id.tvRecyclerViewEmpty).visibility = View.INVISIBLE
+        } else {
+            view?.findViewById<ImageView>(R.id.ivRecyclerViewEmpty)?.visibility = View.VISIBLE
+            view?.findViewById<TextView>(R.id.tvRecyclerViewEmpty)?.visibility = View.VISIBLE
         }
 
         recyclerView.adapter = adapter
@@ -96,6 +115,9 @@ class PastEvents : Fragment() {
         if (adapter.itemCount != 0) {
             view?.findViewById<ImageView>(R.id.ivRecyclerViewEmpty)?.visibility = View.INVISIBLE
             view?.findViewById<TextView>(R.id.tvRecyclerViewEmpty)?.visibility = View.INVISIBLE
+        } else {
+            view?.findViewById<ImageView>(R.id.ivRecyclerViewEmpty)?.visibility = View.VISIBLE
+            view?.findViewById<TextView>(R.id.tvRecyclerViewEmpty)?.visibility = View.VISIBLE
         }
 
         recyclerView.adapter = adapter

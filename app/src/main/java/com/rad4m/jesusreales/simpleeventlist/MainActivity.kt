@@ -138,14 +138,12 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener {
                         event.location = data.getStringExtra("location")
                         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                         event.date = sdf.parse(data.getStringExtra("date"))
-
                         // Search from array and replace.
                         for (i in cellElements.indices) {
                             if (cellElements[i].event!!.name == event.name) {
                                 cellElements[i].event = event
                             }
                         }
-
                         // Update data from recyclerview.
                         val fragment = adapter.mCurrentFragment
                         fragment!!.onResume()
@@ -160,21 +158,21 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener {
 
         val beginDate = returnCompleteDate(cellElement.event!!.date, cellElement.event!!.startTime.subSequence(0, 2).toString().toInt(),
                 cellElement.event!!.startTime.subSequence(3, 5).toString().toInt())
-        val endDate = returnCompleteDate(cellElement.event!!.date, cellElement.event!!.startTime.subSequence(3, 5).toString().toInt(),
-                cellElement.event!!.startTime.subSequence(3, 5).toString().toInt())
+        val endDate = returnCompleteDate(cellElement.event!!.date, cellElement.event!!.endTime.subSequence(3, 5).toString().toInt(),
+                cellElement.event!!.endTime.subSequence(3, 5).toString().toInt())
 
         val intent = Intent(Intent.ACTION_INSERT)
         intent.data = Events.CONTENT_URI
         intent.putExtra(Events.TITLE, cellElement.event?.name)
         intent.putExtra(Events.EVENT_LOCATION, cellElement.event?.location)
-        intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginDate)
-        intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endDate)
+        intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginDate.timeInMillis)
+        intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endDate.timeInMillis)
 
         startActivity(intent)
     }
 
     private fun returnCompleteDate(date: Date, hours: Int, minutes: Int) : Calendar {
-        val cal: Calendar = Calendar.getInstance()
+        val cal: Calendar = GregorianCalendar()
         cal.time = date
         cal.add(Calendar.HOUR, hours)
         cal.add(Calendar.MINUTE, minutes)
