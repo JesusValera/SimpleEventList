@@ -19,16 +19,33 @@ import com.rad4m.jesusreales.simpleeventlist.model.CellElement
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PastEvents : Fragment() {
-
-    lateinit var recyclerView: RecyclerView
-    lateinit var adapter: EventAdapter
+class PastEvents : BaseFragment() {
 
     companion object {
         fun newInstance(): PastEvents = PastEvents()
     }
 
-    private fun selectPastEvents(): ArrayList<CellElement> {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view = inflater.inflate(R.layout.fragment_with_events, container, false)
+
+        recyclerView = view.findViewById(R.id.rvEvents)
+        recyclerView.setHasFixedSize(true)
+
+        recreateAdapter(view)
+
+        val swipeRefresh: SwipeRefreshLayout = view.findViewById(R.id.swipe)
+        swipeRefresh.setOnRefreshListener {
+            recreateAdapter(view)
+
+            if (swipeRefresh.isRefreshing) {
+                swipeRefresh.isRefreshing = false
+            }
+        }
+
+        return view
+    }
+
+    override fun filterEvents(): ArrayList<CellElement> {
         val activity = activity as MainActivity
         val cells = activity.cellElements
         val cellFilter = arrayListOf<CellElement>()
@@ -45,73 +62,6 @@ class PastEvents : Fragment() {
         }
 
         return cellFilter
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_with_events, container, false)
-
-        recyclerView = view.findViewById(R.id.rvEvents)
-        recyclerView.setHasFixedSize(true)
-
-        adapter = EventAdapter(view.context, selectPastEvents())
-
-        adapter.setOnLongClickListener(View.OnLongClickListener {
-            val position = recyclerView.getChildAdapterPosition(it)
-            val element = adapter.getEventByPos(position)
-            val eventOption = EventOptions()
-            eventOption.setCellElement(element)
-            eventOption.show(activity?.fragmentManager, "tag")
-
-            return@OnLongClickListener true
-        })
-
-        if (adapter.itemCount != 0) {
-            view.findViewById<ImageView>(R.id.ivRecyclerViewEmpty).visibility = View.INVISIBLE
-            view.findViewById<TextView>(R.id.tvRecyclerViewEmpty).visibility = View.INVISIBLE
-        } else {
-            view?.findViewById<ImageView>(R.id.ivRecyclerViewEmpty)?.visibility = View.VISIBLE
-            view?.findViewById<TextView>(R.id.tvRecyclerViewEmpty)?.visibility = View.VISIBLE
-        }
-
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-
-
-        val swipeRefresh: SwipeRefreshLayout = view.findViewById(R.id.swipe)
-        swipeRefresh.setOnRefreshListener {
-            recreateAdapter()
-
-            if (swipeRefresh.isRefreshing) {
-                swipeRefresh.isRefreshing = false
-            }
-        }
-
-        return view
-    }
-
-    fun recreateAdapter() {
-        val activity = activity as MainActivity
-        adapter = EventAdapter(context!!, selectPastEvents())
-        adapter.setOnLongClickListener(View.OnLongClickListener {
-            val position = recyclerView.getChildAdapterPosition(it)
-            val element = adapter.getEventByPos(position)
-            val eventOption = EventOptions()
-            eventOption.setCellElement(element)
-            eventOption.show(activity.fragmentManager, "tag")
-
-            return@OnLongClickListener true
-        })
-
-        if (adapter.itemCount != 0) {
-            view?.findViewById<ImageView>(R.id.ivRecyclerViewEmpty)?.visibility = View.INVISIBLE
-            view?.findViewById<TextView>(R.id.tvRecyclerViewEmpty)?.visibility = View.INVISIBLE
-        } else {
-            view?.findViewById<ImageView>(R.id.ivRecyclerViewEmpty)?.visibility = View.VISIBLE
-            view?.findViewById<TextView>(R.id.tvRecyclerViewEmpty)?.visibility = View.VISIBLE
-        }
-
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
     }
 
 }

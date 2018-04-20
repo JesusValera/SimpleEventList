@@ -18,28 +18,10 @@ import com.rad4m.jesusreales.simpleeventlist.model.CellElement
 class EventAdapter(var context: Context, cellElements: ArrayList<CellElement>) : RecyclerView.Adapter<EventAdapter.EventsViewHolder>(), View.OnLongClickListener {
 
     private lateinit var cellElements: List<CellElement>
+    private lateinit var listener: View.OnLongClickListener
 
-    private fun formatDate(event: Event): String {
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        return sdf.format(event.date)
-    }
-
-    private fun isToday(dateString: String): String {
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val today = sdf.format(Date(System.currentTimeMillis()))
-        val yesterday = sdf.format(Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000))
-        val tomorrow = sdf.format(Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000))
-
-        return when (dateString) {
-            today -> "Today"
-            yesterday -> "Yesterday"
-            tomorrow -> "Tomorrow"
-            else -> {
-                val d = sdf.parse(dateString)
-                sdf.applyPattern("dd MMM yyyy")
-                return sdf.format(d)
-            }
-        }
+    init {
+        createDividers(cellElements)
     }
 
     private fun createDividers(cellElements: ArrayList<CellElement>) {
@@ -76,7 +58,28 @@ class EventAdapter(var context: Context, cellElements: ArrayList<CellElement>) :
         this.cellElements = cellEventsAndDividers
     }
 
-    private lateinit var listener: View.OnLongClickListener
+    private fun isToday(dateString: String): String {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val today = sdf.format(Date(System.currentTimeMillis()))
+        val yesterday = sdf.format(Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000))
+        val tomorrow = sdf.format(Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000))
+
+        return when (dateString) {
+            today -> "Today"
+            yesterday -> "Yesterday"
+            tomorrow -> "Tomorrow"
+            else -> {
+                val d = sdf.parse(dateString)
+                sdf.applyPattern("dd MMM yyyy")
+                return sdf.format(d)
+            }
+        }
+    }
+
+    private fun formatDate(event: Event): String {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return sdf.format(event.date)
+    }
 
     override fun getItemViewType(position: Int): Int {
         if (cellElements[position].type == CellElement.TYPE.Event) {
@@ -158,10 +161,6 @@ class EventAdapter(var context: Context, cellElements: ArrayList<CellElement>) :
             }
 
         }
-    }
-
-    init {
-        createDividers(cellElements)
     }
 
 }

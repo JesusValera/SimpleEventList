@@ -18,14 +18,13 @@ class EventOptions : DialogFragment() {
 
         val builder = AlertDialog.Builder(activity)
         builder.setTitle("What do you want to do? (${cellElement.event?.name})")
-                .setItems(items) { _, item ->
-                    when (item) {
-                        0 -> mListener.onDialogAddToCalendar(this, cellElement)
-                        1 -> mListener.onDialogUpdate(this, cellElement)
-                        2 -> mListener.onDialogDelete(this, cellElement)
-                    }
-                }
-        //builder.show()
+        builder.setItems(items) { _, item ->
+            when (item) {
+                0 -> mListener.onDialogAddToCalendar(this, cellElement)
+                1 -> mListener.onDialogUpdate(this, cellElement)
+                2 -> mListener.onDialogDelete(this, cellElement)
+            }
+        }
         return builder.create()
     }
 

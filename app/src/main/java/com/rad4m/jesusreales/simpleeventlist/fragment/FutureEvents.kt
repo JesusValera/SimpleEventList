@@ -1,10 +1,8 @@
 package com.rad4m.jesusreales.simpleeventlist.fragment
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -18,10 +16,7 @@ import com.rad4m.jesusreales.simpleeventlist.dialog.EventOptions
 import com.rad4m.jesusreales.simpleeventlist.model.CellElement
 import java.util.*
 
-class FutureEvents : Fragment() {
-
-    lateinit var adapter: EventAdapter
-    private lateinit var recyclerView: RecyclerView
+class FutureEvents : BaseFragment() {
 
     companion object {
         fun newInstance(): FutureEvents = FutureEvents()
@@ -34,33 +29,11 @@ class FutureEvents : Fragment() {
         recyclerView = view.findViewById(R.id.rvEvents)
         recyclerView.setHasFixedSize(true)
 
-        adapter = EventAdapter(view.context, selectFutureEvents())
-
-        adapter.setOnLongClickListener(View.OnLongClickListener {
-            val position = recyclerView.getChildAdapterPosition(it)
-            val element = adapter.getEventByPos(position)
-            val eventOption = EventOptions()
-            eventOption.setCellElement(element)
-            val activity = activity as MainActivity
-            eventOption.show(activity.fragmentManager, "tag")
-
-            return@OnLongClickListener true
-        })
-
-        if (adapter.itemCount != 0) {
-            view.findViewById<ImageView>(R.id.ivRecyclerViewEmpty).visibility = View.INVISIBLE
-            view.findViewById<TextView>(R.id.tvRecyclerViewEmpty).visibility = View.INVISIBLE
-        } else {
-            view?.findViewById<ImageView>(R.id.ivRecyclerViewEmpty)?.visibility = View.VISIBLE
-            view?.findViewById<TextView>(R.id.tvRecyclerViewEmpty)?.visibility = View.VISIBLE
-        }
-
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        recreateAdapter(view)
 
         val swipeRefresh: SwipeRefreshLayout = view.findViewById(R.id.swipe)
         swipeRefresh.setOnRefreshListener {
-            recreateAdapter()
+            recreateAdapter(view)
 
             if (swipeRefresh.isRefreshing) {
                 swipeRefresh.isRefreshing = false
@@ -70,7 +43,7 @@ class FutureEvents : Fragment() {
         return view
     }
 
-    private fun selectFutureEvents() : ArrayList<CellElement> {
+    override fun filterEvents() : ArrayList<CellElement> {
         val cellFilter = arrayListOf<CellElement>()
         val activity = activity as MainActivity
         val cells = activity.cellElements
@@ -87,31 +60,6 @@ class FutureEvents : Fragment() {
         }
 
         return cellFilter
-    }
-
-    fun recreateAdapter() {
-        val activity = activity as MainActivity
-        adapter = EventAdapter(context!!, selectFutureEvents())
-        adapter.setOnLongClickListener(View.OnLongClickListener {
-            val position = recyclerView.getChildAdapterPosition(it)
-            val element = adapter.getEventByPos(position)
-            val eventOption = EventOptions()
-            eventOption.setCellElement(element)
-            eventOption.show(activity.fragmentManager, "tag")
-
-            return@OnLongClickListener true
-        })
-
-        if (adapter.itemCount != 0) {
-            view?.findViewById<ImageView>(R.id.ivRecyclerViewEmpty)?.visibility = View.INVISIBLE
-            view?.findViewById<TextView>(R.id.tvRecyclerViewEmpty)?.visibility = View.INVISIBLE
-        } else {
-            view?.findViewById<ImageView>(R.id.ivRecyclerViewEmpty)?.visibility = View.VISIBLE
-            view?.findViewById<TextView>(R.id.tvRecyclerViewEmpty)?.visibility = View.VISIBLE
-        }
-
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
     }
 
 }

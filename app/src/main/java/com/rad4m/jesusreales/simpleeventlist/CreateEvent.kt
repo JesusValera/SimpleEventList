@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.EditText
-import android.widget.TimePicker
 import android.widget.Toast
 import com.rad4m.jesusreales.simpleeventlist.dialog.DatePickerFragment
 import com.rad4m.jesusreales.simpleeventlist.dialog.TimePickerFragment
@@ -95,23 +94,21 @@ class CreateEvent : AppCompatActivity(), DatePickerFragment.DateDialogListener, 
     }
 
     override fun onSelectedDate(dialog: DialogFragment, year: Int, month: Int, dayOfMonth: Int) {
-        val date = "$year-${twoNumbers(month)}-${twoNumbers(dayOfMonth)}"
+        val date = "$year-${setTwoNumbersToTime(month)}-${setTwoNumbersToTime(dayOfMonth)}"
         etDate.setText(date)
     }
 
     override fun onSelectedDate(dialog: DialogFragment, hourOfDay: Int, minute: Int, tag: String) {
 
-        val time = "${twoNumbers(hourOfDay)}:${twoNumbers(minute)}"
+        val time = "${setTwoNumbersToTime(hourOfDay)}:${setTwoNumbersToTime(minute)}"
 
-        if (tag == "startTime") {
-            etStartTime.setText(time)
-        }
-        if (tag == "endTime") {
-            etEndTime.setText(time)
+        when (tag) {
+            "startTime" -> etStartTime.setText(time)
+            "endTime" -> etEndTime.setText(time)
         }
     }
 
-    private fun twoNumbers(number: Int) = if (number.toString().length < 2) {
+    private fun setTwoNumbersToTime(number: Int) = if (number.toString().length < 2) {
         "0" + number.toString()
     } else {
         number.toString()

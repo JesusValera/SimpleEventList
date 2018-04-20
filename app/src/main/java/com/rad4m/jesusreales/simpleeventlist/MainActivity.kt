@@ -11,20 +11,18 @@ import com.rad4m.jesusreales.simpleeventlist.model.Event
 import android.provider.CalendarContract.Events
 import android.provider.CalendarContract
 import android.support.design.widget.TabLayout
-import android.support.v4.content.ContextCompat
 import android.support.v4.content.res.ResourcesCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.Toolbar
 import com.rad4m.jesusreales.simpleeventlist.adapter.SampleAdapter
-import com.rad4m.jesusreales.simpleeventlist.fragment.FutureEvents
-import com.rad4m.jesusreales.simpleeventlist.fragment.PastEvents
+import com.rad4m.jesusreales.simpleeventlist.fragment.BaseFragment
 import com.rad4m.jesusreales.simpleeventlist.model.CellElement
 import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener {
 
-    lateinit var cellElements: ArrayList<CellElement>
+    val cellElements: ArrayList<CellElement> = ArrayList()
     private val INTENT_FOR_RESULT = 1
     private val INTENT_FOR_RESULT_UPDATE = 2
     private val pictures = arrayListOf(R.drawable.comp0, R.drawable.comp1, R.drawable.comp2, R.drawable.comp3)
@@ -52,8 +50,6 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener {
     }
 
     private fun createDemoEvents() {
-        cellElements = ArrayList()
-
         val dates = createDates()
         for (i in 1..5) {
             val event = Event("Event n${i}")
@@ -98,47 +94,23 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             INTENT_FOR_RESULT -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    if (data != null) {
-                        val name = data.getStringExtra("name")
-                        val event = Event(name)
-                        event.location = data.getStringExtra("location")
-                        event.picture = ContextCompat.getDrawable(applicationContext, pictures[random(4)])
-                        event.startTime = data.getStringExtra("startTime")
-                        event.endTime = data.getStringExtra("endTime")
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    val event = createEventFromResult(data)
+                    cellElements.add(CellElement(event))
 
-                        try {
-                            val aTime = data.getStringExtra("date")
-                            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                            val cal = Calendar.getInstance()
-                            cal.time = sdf.parse(aTime)
-                            event.date = sdf.parse(aTime)
-                        } catch (e: Exception) {
-                        }
-                        cellElements.add(CellElement(event))
-                    }
                 }
             }
             INTENT_FOR_RESULT_UPDATE -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    if (data != null) {
-                        // Get vars. from data.
-                        val name = data.getStringExtra("name")
-                        val event = Event(name)
-                        event.startTime = data.getStringExtra("startTime")
-                        event.endTime = data.getStringExtra("endTime")
-                        event.location = data.getStringExtra("location")
-                        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                        event.date = sdf.parse(data.getStringExtra("date"))
-                        // Search from array and replace.
-                        for (i in cellElements.indices) {
-                            if (cellElements[i].event!!.name == event.name) {
-                                cellElements[i].event = event
-                            }
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    val event = createEventFromResult(data)
+                    // Search from array and replace.
+                    for (i in cellElements.indices) {
+                        if (cellElements[i].event!!.name == event.name) {
+                            // Set the same picture.
+                            event.picture = cellElements[i].event?.picture
+                            // Replace.
+                            cellElements[i].event = event
                         }
-                        // Update data from recyclerview.
-                        val fragment = adapter.mCurrentFragment
-                        fragment!!.onResume()
                     }
                 }
             }
@@ -147,12 +119,35 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
+    private fun createEventFromResult(data: Intent): Event {
+        val name = data.getStringExtra("name")
+        val event = Event(name)
+        event.startTime = data.getStringExtra("startTime")
+        event.endTime = data.getStringExtra("endTime")
+        event.location = data.getStringExtra("location")
+        event.picture = ResourcesCompat.getDrawable(resources, pictures[random(4)], null)
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        event.date = sdf.parse(data.getStringExtra("date"))
+
+        return event
+    }
+
+    override fun onDialogDelete(dialog: DialogFragment, cellElement: CellElement) {
+        cellElements.remove(cellElement)
+        updateCurrentFrag()
+    }
+
+    private fun updateCurrentFrag() {
+        val fragment = adapter.mCurrentFragment
+        if (fragment is BaseFragment) {
+            fragment.recreateAdapter(fragment.view!!)
+        }
+    }
+
     override fun onDialogAddToCalendar(dialog: DialogFragment, cellElement: CellElement) {
 
-        val beginDate = returnCompleteDate(cellElement.event!!.date, cellElement.event!!.startTime.subSequence(0, 2).toString().toInt(),
-                cellElement.event!!.startTime.subSequence(3, 5).toString().toInt())
-        val endDate = returnCompleteDate(cellElement.event!!.date, cellElement.event!!.endTime.subSequence(3, 5).toString().toInt(),
-                cellElement.event!!.endTime.subSequence(3, 5).toString().toInt())
+        val beginDate = returnCompleteDate(cellElement.event!!, cellElement.event!!.startTime)
+        val endDate = returnCompleteDate(cellElement.event!!, cellElement.event!!.endTime)
 
         val intent = Intent(Intent.ACTION_INSERT)
         intent.data = Events.CONTENT_URI
@@ -164,7 +159,11 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener {
         startActivity(intent)
     }
 
-    private fun returnCompleteDate(date: Date, hours: Int, minutes: Int) : Calendar {
+    private fun returnCompleteDate(event: Event, time: String) : Calendar {
+        val date = event.date
+        val hours = time.subSequence(0, 2).toString().toInt()
+        val minutes = time.subSequence(3, 5).toString().toInt()
+
         val cal: Calendar = GregorianCalendar()
         cal.time = date
         cal.add(Calendar.HOUR, hours)
@@ -174,7 +173,6 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener {
     }
 
     override fun onDialogUpdate(dialog: DialogFragment, cellElement: CellElement) {
-
         val event = cellElement.event
         val intent = Intent(this.applicationContext, CreateEvent::class.java)
         intent.putExtra("name", event!!.name)
@@ -184,36 +182,9 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener {
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val dateformat = sdf.format(event.date)
         intent.putExtra("date", dateformat)
+
         startActivityForResult(intent, INTENT_FOR_RESULT_UPDATE)
-
         //Log.i("dialogUpdate", "update ${cellElement.event?.name}")
-    }
-
-    private fun updateCurrentFrag() {
-        val fragment = adapter.mCurrentFragment
-
-        if (fragment is PastEvents) {
-            fragment.recreateAdapter()
-        }
-        if (fragment is FutureEvents) {
-            fragment.recreateAdapter()
-        }
-
-        /*for (i in 0..adapter.count) {
-            val fr = adapter.getItem(i)
-
-            if (fr is PastEvents) {
-                fr.recreateAdapter()
-            }
-            if (fr is FutureEvents) {
-                fr.recreateAdapter()
-            }
-        }*/
-    }
-
-    override fun onDialogDelete(dialog: DialogFragment, cellElement: CellElement) {
-        cellElements.remove(cellElement)
-        updateCurrentFrag()
     }
 
 }
