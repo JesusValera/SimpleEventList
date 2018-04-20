@@ -2,6 +2,7 @@ package com.rad4m.jesusreales.simpleeventlist.fragment
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.format.DateUtils
@@ -57,6 +58,15 @@ class FutureEvents : Fragment() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
+        val swipeRefresh: SwipeRefreshLayout = view.findViewById(R.id.swipe)
+        swipeRefresh.setOnRefreshListener {
+            recreateAdapter()
+
+            if (swipeRefresh.isRefreshing) {
+                swipeRefresh.isRefreshing = false
+            }
+        }
+
         return view
     }
 
@@ -67,33 +77,16 @@ class FutureEvents : Fragment() {
         cells.sort()
 
         for (i in cells.indices) {
-            /*if (DateUtils.isToday(cells[i].event!!.date.time)) {
+            if (DateUtils.isToday(cells[i].event!!.date.time)) {
                 cellFilter.add(cells[i])
                 continue
-            }*/
-            val date = returnCompleteDate(cells[i].event!!.date,
-                    cells[i].event!!.startTime.subSequence(0, 2).toString().toInt(),
-                    cells[i].event!!.startTime.subSequence(3, 5).toString().toInt())
-            if (date.timeInMillis > System.currentTimeMillis()) {
+            }
+            if (cells[i].event!!.date.after(Date(System.currentTimeMillis()))) {
                 cellFilter.add(cells[i])
             }
         }
 
         return cellFilter
-    }
-
-    private fun returnCompleteDate(date: Date, hours: Int, minutes: Int): Calendar {
-        val cal: Calendar = GregorianCalendar()
-        cal.time = date
-        cal.add(Calendar.HOUR, hours)
-        cal.add(Calendar.MINUTE, minutes)
-
-        return cal
-    }
-
-    override fun onResume() {
-        recreateAdapter()
-        super.onResume()
     }
 
     fun recreateAdapter() {

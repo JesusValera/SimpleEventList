@@ -2,11 +2,9 @@ package com.rad4m.jesusreales.simpleeventlist
 
 import android.app.Activity
 import android.app.DialogFragment
-import android.app.Fragment
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import com.rad4m.jesusreales.simpleeventlist.dialog.EventOptions
 import com.rad4m.jesusreales.simpleeventlist.model.Event
@@ -45,12 +43,6 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener {
         viewPager.adapter = adapter
         tabLayout.setupWithViewPager(viewPager)
 
-        /*tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab) {}
-            override fun onTabUnselected(tab: TabLayout.Tab) {}
-            override fun onTabReselected(tab: TabLayout.Tab) {}
-        })*/
-
         createDemoEvents()
     }
 
@@ -68,8 +60,8 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener {
             event.picture = ResourcesCompat.getDrawable(resources, pictures[random(4)], null)
             event.date = dates[i - 1]
             event.startTime = "10:00"
-            event.endTime = "11:00"
-            event.location = "Krakow"
+            event.endTime = "13:30"
+            event.location = "Kazimierza Kordylewskiego 7-5, Kraków"
             val cellElement = CellElement(event)
             cellElements.add(cellElement)
         }
@@ -151,6 +143,7 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener {
                 }
             }
         }
+        updateCurrentFrag()
         super.onActivityResult(requestCode, resultCode, data)
     }
 
@@ -193,13 +186,18 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener {
         intent.putExtra("date", dateformat)
         startActivityForResult(intent, INTENT_FOR_RESULT_UPDATE)
 
-        Log.i("dialogUpdate", "update ${cellElement.event?.name}")
+        //Log.i("dialogUpdate", "update ${cellElement.event?.name}")
     }
 
-    override fun onDialogDelete(dialog: DialogFragment, cellElement: CellElement) {
-        cellElements.remove(cellElement)
+    private fun updateCurrentFrag() {
         val fragment = adapter.mCurrentFragment
-        fragment!!.onResume()
+
+        if (fragment is PastEvents) {
+            fragment.recreateAdapter()
+        }
+        if (fragment is FutureEvents) {
+            fragment.recreateAdapter()
+        }
 
         /*for (i in 0..adapter.count) {
             val fr = adapter.getItem(i)
@@ -211,7 +209,11 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener {
                 fr.recreateAdapter()
             }
         }*/
+    }
 
+    override fun onDialogDelete(dialog: DialogFragment, cellElement: CellElement) {
+        cellElements.remove(cellElement)
+        updateCurrentFrag()
     }
 
 }
