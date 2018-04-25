@@ -1,31 +1,26 @@
-package com.rad4m.jesusreales.simpleeventlist.fragment
+package com.rad4m.jesusreales.simpleeventlist.events.fragment
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import com.rad4m.jesusreales.simpleeventlist.MainActivity
+import com.rad4m.jesusreales.simpleeventlist.events.MainActivity
 import com.rad4m.jesusreales.simpleeventlist.R
-import com.rad4m.jesusreales.simpleeventlist.adapter.EventAdapter
-import com.rad4m.jesusreales.simpleeventlist.dialog.EventOptions
-import com.rad4m.jesusreales.simpleeventlist.model.CellElement
+import com.rad4m.jesusreales.simpleeventlist.data.model.CellElement
 import java.util.*
-import kotlin.collections.ArrayList
 
-class PastEvents : BaseFragment() {
+class FutureEventsFragment : BaseFragment(), FragmentEventsContract.View {
+
+    override lateinit var presenter: FragmentEventsContract.Presenter
 
     companion object {
-        fun newInstance(): PastEvents = PastEvents()
+        fun newInstance(): FutureEventsFragment = FutureEventsFragment()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_with_events, container, false)
 
         recyclerView = view.findViewById(R.id.rvEvents)
@@ -45,18 +40,18 @@ class PastEvents : BaseFragment() {
         return view
     }
 
-    override fun filterEvents(): ArrayList<CellElement> {
+    override fun filterEvents() : ArrayList<CellElement> {
+        val cellFilter = arrayListOf<CellElement>()
         val activity = activity as MainActivity
         val cells = activity.cellElements
-        val cellFilter = arrayListOf<CellElement>()
-        cells.sortDescending()
+        cells.sort()
 
         for (i in cells.indices) {
             if (DateUtils.isToday(cells[i].event!!.date.time)) {
                 cellFilter.add(cells[i])
                 continue
             }
-            if (cells[i].event!!.date.before(Date(System.currentTimeMillis()))) {
+            if (cells[i].event!!.date.after(Date(System.currentTimeMillis()))) {
                 cellFilter.add(cells[i])
             }
         }

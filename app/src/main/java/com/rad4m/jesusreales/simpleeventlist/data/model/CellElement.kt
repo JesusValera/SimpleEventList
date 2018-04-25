@@ -1,4 +1,4 @@
-package com.rad4m.jesusreales.simpleeventlist.model
+package com.rad4m.jesusreales.simpleeventlist.data.model
 
 class CellElement : Comparable<CellElement> {
 

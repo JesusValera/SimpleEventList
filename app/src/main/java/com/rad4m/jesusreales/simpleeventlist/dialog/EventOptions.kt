@@ -4,9 +4,8 @@ import android.app.DialogFragment
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
-import android.app.Activity
-import com.rad4m.jesusreales.simpleeventlist.model.CellElement
-import com.rad4m.jesusreales.simpleeventlist.model.Event
+import android.content.Context
+import com.rad4m.jesusreales.simpleeventlist.data.model.CellElement
 
 class EventOptions : DialogFragment() {
 
@@ -38,12 +37,12 @@ class EventOptions : DialogFragment() {
         fun onDialogDelete(dialog: DialogFragment, cellElement: CellElement)
     }
 
-    override fun onAttach(activity: Activity) {
-        super.onAttach(activity)
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
         try {
-            mListener = activity as DialogEventListener
+            mListener = context as DialogEventListener
         } catch (e: ClassCastException) {
-            throw ClassCastException(activity.toString() + " must implement DialogEventListener")
+            throw ClassCastException(context.toString() + " must implement DialogEventListener")
         }
 
     }

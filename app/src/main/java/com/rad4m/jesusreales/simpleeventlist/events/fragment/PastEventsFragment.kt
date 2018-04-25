@@ -1,29 +1,24 @@
-package com.rad4m.jesusreales.simpleeventlist.fragment
+package com.rad4m.jesusreales.simpleeventlist.events.fragment
 
 import android.os.Bundle
 import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.widget.LinearLayoutManager
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import com.rad4m.jesusreales.simpleeventlist.MainActivity
+import com.rad4m.jesusreales.simpleeventlist.events.MainActivity
 import com.rad4m.jesusreales.simpleeventlist.R
-import com.rad4m.jesusreales.simpleeventlist.adapter.EventAdapter
-import com.rad4m.jesusreales.simpleeventlist.dialog.EventOptions
-import com.rad4m.jesusreales.simpleeventlist.model.CellElement
+import com.rad4m.jesusreales.simpleeventlist.data.model.CellElement
 import java.util.*
+import kotlin.collections.ArrayList
 
-class FutureEvents : BaseFragment() {
+class PastEventsFragment : BaseFragment() {
 
     companion object {
-        fun newInstance(): FutureEvents = FutureEvents()
+        fun newInstance(): PastEventsFragment = PastEventsFragment()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_with_events, container, false)
 
         recyclerView = view.findViewById(R.id.rvEvents)
@@ -43,18 +38,18 @@ class FutureEvents : BaseFragment() {
         return view
     }
 
-    override fun filterEvents() : ArrayList<CellElement> {
-        val cellFilter = arrayListOf<CellElement>()
+    override fun filterEvents(): ArrayList<CellElement> {
         val activity = activity as MainActivity
         val cells = activity.cellElements
-        cells.sort()
+        val cellFilter = arrayListOf<CellElement>()
+        cells.sortDescending()
 
         for (i in cells.indices) {
             if (DateUtils.isToday(cells[i].event!!.date.time)) {
                 cellFilter.add(cells[i])
                 continue
             }
-            if (cells[i].event!!.date.after(Date(System.currentTimeMillis()))) {
+            if (cells[i].event!!.date.before(Date(System.currentTimeMillis()))) {
                 cellFilter.add(cells[i])
             }
         }

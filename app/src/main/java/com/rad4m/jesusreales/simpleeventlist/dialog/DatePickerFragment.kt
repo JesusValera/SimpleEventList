@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.widget.DatePicker
 import java.util.*
 import android.app.Activity
+import android.content.Context
 
 class DatePickerFragment : DialogFragment(), DatePickerDialog.OnDateSetListener {
 
@@ -30,8 +31,8 @@ class DatePickerFragment : DialogFragment(), DatePickerDialog.OnDateSetListener 
         fun onSelectedDate(dialog: DialogFragment, year: Int, month: Int, dayOfMonth: Int)
     }
 
-    override fun onAttach(activity: Activity) {
-        super.onAttach(activity)
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
         // Verify that the host activity implements the callback interface
         try {
             mListener = activity as DateDialogListener

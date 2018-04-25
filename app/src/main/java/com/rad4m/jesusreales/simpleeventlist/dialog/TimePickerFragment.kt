@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Dialog
 import android.app.DialogFragment
 import android.app.TimePickerDialog
+import android.content.Context
 import android.os.Bundle
 import android.widget.TimePicker
 import java.util.*
@@ -29,8 +30,8 @@ class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSetListener 
         fun onSelectedDate(dialog: DialogFragment, hourOfDay: Int, minute: Int, tag: String)
     }
 
-    override fun onAttach(activity: Activity) {
-        super.onAttach(activity)
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
         // Verify that the host activity implements the callback interface
         try {
             mListener = activity as DateDialogListener

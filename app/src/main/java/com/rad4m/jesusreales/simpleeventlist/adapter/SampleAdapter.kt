@@ -4,8 +4,8 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.view.ViewGroup
-import com.rad4m.jesusreales.simpleeventlist.fragment.FutureEvents
-import com.rad4m.jesusreales.simpleeventlist.fragment.PastEvents
+import com.rad4m.jesusreales.simpleeventlist.events.fragment.FutureEventsFragment
+import com.rad4m.jesusreales.simpleeventlist.events.fragment.PastEventsFragment
 
 class SampleAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
@@ -20,8 +20,8 @@ class SampleAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
     }
 
     override fun getItem(position: Int): Fragment? = when (position) {
-        0 -> PastEvents.newInstance()
-        1 -> FutureEvents.newInstance()
+        0 -> PastEventsFragment.newInstance()
+        1 -> FutureEventsFragment.newInstance()
         else -> null
     }
 

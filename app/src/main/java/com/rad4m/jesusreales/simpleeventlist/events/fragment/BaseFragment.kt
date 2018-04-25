@@ -1,4 +1,4 @@
-package com.rad4m.jesusreales.simpleeventlist.fragment
+package com.rad4m.jesusreales.simpleeventlist.events.fragment
 
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
@@ -9,11 +9,14 @@ import android.widget.TextView
 import com.rad4m.jesusreales.simpleeventlist.R
 import com.rad4m.jesusreales.simpleeventlist.adapter.EventAdapter
 import com.rad4m.jesusreales.simpleeventlist.dialog.EventOptions
-import com.rad4m.jesusreales.simpleeventlist.model.CellElement
+import com.rad4m.jesusreales.simpleeventlist.data.model.CellElement
+import kotlin.collections.ArrayList
 
-abstract class BaseFragment : Fragment() {
+abstract class BaseFragment : Fragment(), FragmentEventsContract.View {
 
-    private lateinit var adapter: EventAdapter
+    override lateinit var presenter: FragmentEventsContract.Presenter
+
+    protected lateinit var adapter: EventAdapter
     protected lateinit var recyclerView: RecyclerView
 
     abstract fun filterEvents() : ArrayList<CellElement>
@@ -31,14 +34,15 @@ abstract class BaseFragment : Fragment() {
         })
 
         if (adapter.itemCount != 0) {
-            view.findViewById<ImageView>(R.id.ivRecyclerViewEmpty).visibility = View.INVISIBLE
-            view.findViewById<TextView>(R.id.tvRecyclerViewEmpty).visibility = View.INVISIBLE
+            view.findViewById<ImageView>(R.id.ivRecyclerViewEmpty)?.visibility = View.INVISIBLE
+            view.findViewById<TextView>(R.id.tvRecyclerViewEmpty)?.visibility = View.INVISIBLE
         } else {
-            view.findViewById<ImageView>(R.id.ivRecyclerViewEmpty).visibility = View.VISIBLE
-            view.findViewById<TextView>(R.id.tvRecyclerViewEmpty).visibility = View.VISIBLE
+            view.findViewById<ImageView>(R.id.ivRecyclerViewEmpty)?.visibility = View.VISIBLE
+            view.findViewById<TextView>(R.id.tvRecyclerViewEmpty)?.visibility = View.VISIBLE
         }
 
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
     }
+
 }

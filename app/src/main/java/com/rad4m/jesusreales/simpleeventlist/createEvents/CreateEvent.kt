@@ -1,4 +1,4 @@
-package com.rad4m.jesusreales.simpleeventlist
+package com.rad4m.jesusreales.simpleeventlist.createEvents
 
 import android.app.Activity
 import android.app.DialogFragment
@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.EditText
 import android.widget.Toast
+import com.rad4m.jesusreales.simpleeventlist.R
 import com.rad4m.jesusreales.simpleeventlist.dialog.DatePickerFragment
 import com.rad4m.jesusreales.simpleeventlist.dialog.TimePickerFragment
 
@@ -67,6 +68,7 @@ class CreateEvent : AppCompatActivity(), DatePickerFragment.DateDialogListener, 
             etName.isFocusable = false
             etName.isFocusableInTouchMode = false
             etName.isClickable = false
+            etName.keyListener = null
 
             etName.setText(intent.getStringExtra("name"))
             etDate.setText(intent.getStringExtra("date"))
