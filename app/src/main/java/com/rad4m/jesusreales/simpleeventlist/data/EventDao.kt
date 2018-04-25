@@ -12,7 +12,7 @@ interface EventDao {
     @Query("SELECT * FROM event WHERE name = :name")
     fun findByName(name: String)
 
-    @Insert()
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(event: Event)
 
     @Delete

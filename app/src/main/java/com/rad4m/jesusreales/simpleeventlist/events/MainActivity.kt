@@ -21,17 +21,17 @@ import java.util.*
 
 class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener, MainActivityContract.View {
 
-    override lateinit var presenter: MainActivityContract.Presenter
+    override lateinit var mPresenter: MainActivityContract.Presenter
 
     val cellElements: ArrayList<CellElement> = ArrayList()
+    private lateinit var mViewPager: ViewPager
+    private lateinit var mAdapter: SampleAdapter
     private val INTENT_FOR_RESULT = 1
     private val INTENT_FOR_RESULT_UPDATE = 2
-    private lateinit var viewPager: ViewPager
-    private lateinit var adapter: SampleAdapter
 
     override fun onResume() {
         super.onResume()
-        presenter.start()
+        mPresenter.start()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,15 +42,15 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener, Main
         initToolbar()
 
         val tabLayout: TabLayout = findViewById(R.id.tab_layout)
-        viewPager = findViewById(R.id.view_pager)
-        adapter = SampleAdapter(supportFragmentManager)
+        mViewPager = findViewById(R.id.view_pager)
+        mAdapter = SampleAdapter(supportFragmentManager)
 
-        viewPager.adapter = adapter
-        tabLayout.setupWithViewPager(viewPager)
+        mViewPager.adapter = mAdapter
+        tabLayout.setupWithViewPager(mViewPager)
 
         CreateDemoEvents(applicationContext).createDemoEvents(cellElements)
 
-        presenter = MainActivityPresenter(this)
+        mPresenter = MainActivityPresenter(this)
     }
 
     private fun initToolbar() {
@@ -67,52 +67,60 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener, Main
         when (item?.itemId) {
             R.id.menuCreateEvent -> {
                 val intent = Intent(this.applicationContext, CreateEvent::class.java)
-                presenter.createEvent(intent)
+                mPresenter.createEventActivity(intent)
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    /*override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             INTENT_FOR_RESULT -> {
                 if (resultCode == Activity.RESULT_OK && data != null) {
                     // Insert event into SQLite.
-                    val event: Event = presenter.createEventFromResult(data, applicationContext)
-                    cellElements.add(CellElement(event))
+                    val pic = CreateDemoEvents(baseContext).getRandomPicture()
+                    mPresenter.createEventFromResult(data, pic)
                 }
             }
             INTENT_FOR_RESULT_UPDATE -> {
                 if (resultCode == Activity.RESULT_OK && data != null) {
-                    val event = presenter.createEventFromResult(data, applicationContext)
-                    // Search from array and replace. -- TODO Search from Room SQLite.
-                    // --> presenter.loadEvents()
-                    for (i in cellElements.indices) {
-                        if (cellElements[i].event!!.name == event.name) {
-                            // Set the same picture.
-                            event.picture = cellElements[i].event?.picture!!
-                            cellElements[i].event = event
-                        }
-                    }
+                    val pic = CreateDemoEvents(baseContext).getRandomPicture()
+                    mPresenter.createEventFromResultUpdate(data, pic)
                 }
             }
         }
-        presenter.updateCurrentFragment(adapter.mCurrentFragment as BaseFragment)
+        mPresenter.updateCurrentFragment(mAdapter.mCurrentFragment as BaseFragment)
         super.onActivityResult(requestCode, resultCode, data)
+    }*/
+
+    override fun addEventToEventList(event: Event) {
+        cellElements.add(CellElement(event))
+    }
+
+    override fun updateEventFromEventList(event: Event) {
+        // Search from array and replace. -- TODO Search from Room SQLite.
+        // --> mPresenter.loadEvents()
+        for (i in cellElements.indices) {
+            if (cellElements[i].event!!.name == event.name) {
+                // Set the same picture.
+                event.picture = cellElements[i].event?.picture!!
+                cellElements[i].event = event
+            }
+        }
     }
 
     override fun onDialogDelete(dialog: DialogFragment, cellElement: CellElement) {
-        presenter.deleteEvent(cellElements, cellElement)
-        presenter.updateCurrentFragment(adapter.mCurrentFragment as BaseFragment)
+        mPresenter.deleteEvent(cellElements, cellElement)
+        mPresenter.updateCurrentFragment(mAdapter.mCurrentFragment as BaseFragment)
     }
 
     override fun onDialogAddToCalendar(dialog: DialogFragment, cellElement: CellElement) {
-        presenter.addEventToCalendar(cellElement.event!!)
+        mPresenter.addEventToCalendar(cellElement.event!!)
     }
 
     override fun onDialogUpdate(dialog: DialogFragment, cellElement: CellElement) {
         val intent = Intent(applicationContext, CreateEvent::class.java)
-        presenter.updateEvent(cellElement.event!!, intent)
+        mPresenter.updateEvent(cellElement.event!!, intent)
     }
 
     override fun startEventCalendar(intent: Intent) {

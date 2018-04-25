@@ -38,7 +38,7 @@ class EventAdapter(var context: Context, cellElements: ArrayList<CellElement>) :
             }
 
             if (cellEventsAndDividers[cellEventsAndDividers.size - 1].type == CellElement.TYPE.Event)
-                if (!isSameDay( cellElements[i].event!!.date, cellEventsAndDividers[cellEventsAndDividers.size - 1].event!!.date)) {
+                if (!isSameDay( cellElements[i].event!!.date!!, cellEventsAndDividers[cellEventsAndDividers.size - 1].event!!.date!!)) {
                     val dateEvent = getDateString(formatDate(cellElements[i].event!!))
                     val divider = CellElement(dateEvent)
 

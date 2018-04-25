@@ -17,6 +17,10 @@ interface MainActivityContract {
         fun startUpdateEvent(intent: Intent)
 
         fun startCreateEvent(intent: Intent)
+
+        fun addEventToEventList(event: Event)
+
+        fun updateEventFromEventList(event: Event)
     }
 
     interface Presenter : BasePresenter {
@@ -29,9 +33,11 @@ interface MainActivityContract {
 
         fun updateCurrentFragment(fragment: BaseFragment)
 
-        fun createEventFromResult(data: Intent, context: Context): Event
+        fun createEventFromResult(data: Intent, picture: Int)
 
-        fun createEvent(intent: Intent)
+        fun createEventFromResultUpdate(data: Intent, picture: Int)
+
+        fun createEventActivity(intent: Intent)
     }
 
 }

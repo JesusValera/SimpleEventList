@@ -10,15 +10,15 @@ import com.rad4m.jesusreales.simpleeventlist.data.model.Event
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MainActivityPresenter(val mainActivity: MainActivityContract.View): MainActivityContract.Presenter {
+class MainActivityPresenter(val mView: MainActivityContract.View): MainActivityContract.Presenter {
 
     override fun start() {
-
+        // GET EVENTS FROM DATA SOURCE.
     }
 
     override fun addEventToCalendar(event: Event) {
-        val beginDate = returnCompleteDate(event, event.startTime)
-        val endDate = returnCompleteDate(event, event.endTime)
+        val beginDate = returnCompleteDate(event, event.startTime!!)
+        val endDate = returnCompleteDate(event, event.endTime!!)
 
         val intent = Intent(Intent.ACTION_INSERT)
         intent.data = CalendarContract.Events.CONTENT_URI
@@ -27,7 +27,7 @@ class MainActivityPresenter(val mainActivity: MainActivityContract.View): MainAc
         intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginDate.timeInMillis)
         intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endDate.timeInMillis)
 
-        mainActivity.startEventCalendar(intent)
+        mView.startEventCalendar(intent)
     }
 
     private fun returnCompleteDate(event: Event, time: String) : Calendar {
@@ -52,7 +52,7 @@ class MainActivityPresenter(val mainActivity: MainActivityContract.View): MainAc
         val dateformat = sdf.format(event.date)
         intent.putExtra("date", dateformat)
 
-        mainActivity.startUpdateEvent(intent)
+        mView.startUpdateEvent(intent)
     }
 
     override fun deleteEvent(cellElements: ArrayList<CellElement>, cellElement: CellElement) {
@@ -63,20 +63,31 @@ class MainActivityPresenter(val mainActivity: MainActivityContract.View): MainAc
         fragment.recreateAdapter(fragment.view!!)
     }
 
-    override fun createEventFromResult(data: Intent, context: Context): Event {
-        val name = data.getStringExtra("name")
-        val event = Event(name)
+    override fun createEventFromResult(data: Intent, picture: Int) {
+        val event = createEvent(data, picture)
+        mView.addEventToEventList(event)
+    }
+
+    override fun createEventFromResultUpdate(data: Intent, picture: Int) {
+        val event = createEvent(data, picture)
+        mView.updateEventFromEventList(event)
+    }
+
+    private fun createEvent(data: Intent, picture: Int) : Event {
+        val event = Event()
+        event.name = data.getStringExtra("name")
         event.startTime = data.getStringExtra("startTime")
         event.endTime = data.getStringExtra("endTime")
         event.location = data.getStringExtra("location")
-        event.picture = CreateDemoEvents(context).getRandomPicture()
+        event.picture = picture
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         event.date = sdf.parse(data.getStringExtra("date"))
 
         return event
     }
 
-    override fun createEvent(intent: Intent) {
-        mainActivity.startCreateEvent(intent)
+    override fun createEventActivity(intent: Intent) {
+        mView.startCreateEvent(intent)
     }
+
 }

@@ -21,7 +21,7 @@ class CellElement : Comparable<CellElement> {
     }
 
     override fun compareTo(other: CellElement): Int {
-        return if (this.event!!.date.after(other.event!!.date)) {
+        return if (this.event!!.date!!.after(other.event!!.date)) {
             1
         } else {
             -1

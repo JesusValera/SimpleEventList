@@ -13,7 +13,8 @@ class CreateDemoEvents(val context: Context) {
     fun createDemoEvents(cellElements : ArrayList<CellElement>) {
         val dates = createDates()
         for (i in 1..5) {
-            val event = Event("Event n${i}")
+            val event = Event()
+            event.name = "Event n${i}"
             event.picture = getRandomPicture()
             event.date = dates[i - 1]
             event.startTime = "10:00"

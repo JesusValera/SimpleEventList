@@ -10,11 +10,11 @@ import android.widget.Toast
 import com.rad4m.jesusreales.simpleeventlist.R
 import com.rad4m.jesusreales.simpleeventlist.dialog.DatePickerFragment
 import com.rad4m.jesusreales.simpleeventlist.dialog.TimePickerFragment
-
 import kotlinx.android.synthetic.main.activity_create_event.*
 
-class CreateEvent : AppCompatActivity(), DatePickerFragment.DateDialogListener, TimePickerFragment.DateDialogListener {
+class CreateEvent : AppCompatActivity(), DatePickerFragment.DateDialogListener, TimePickerFragment.DateDialogListener, CreateEventContract.View {
 
+    override lateinit var mPresenter: CreateEventContract.Presenter
     private lateinit var etName: EditText
     private lateinit var etDate: EditText
     private lateinit var etStartTime: EditText
@@ -26,13 +26,16 @@ class CreateEvent : AppCompatActivity(), DatePickerFragment.DateDialogListener, 
         setContentView(R.layout.activity_create_event)
         setSupportActionBar(toolbar)
 
-        findViewsById()
+        mPresenter = CreateEventPresenter(this)
 
-        isUpdatingEvent()
+        updatingEvent()
 
         listeners()
 
         fab.setOnClickListener {
+            // Create an Event and save into SQL. Not with setResult.
+            //mPresenter.onClick(it)
+
             val name = etName.text.toString()
             val date = etDate.text.toString()
             val startTime = etStartTime.text.toString()
@@ -55,7 +58,7 @@ class CreateEvent : AppCompatActivity(), DatePickerFragment.DateDialogListener, 
         }
     }
 
-    private fun findViewsById() {
+    override fun initView() {
         etName = findViewById(R.id.etName)
         etDate = findViewById(R.id.etDate)
         etStartTime = findViewById(R.id.etStartTime)
@@ -63,7 +66,7 @@ class CreateEvent : AppCompatActivity(), DatePickerFragment.DateDialogListener, 
         etLocation = findViewById(R.id.etLocation)
     }
 
-    private fun isUpdatingEvent() {
+    private fun updatingEvent() {
         if (intent.hasExtra("name")) {
             etName.isFocusable = false
             etName.isFocusableInTouchMode = false
@@ -101,9 +104,7 @@ class CreateEvent : AppCompatActivity(), DatePickerFragment.DateDialogListener, 
     }
 
     override fun onSelectedDate(dialog: DialogFragment, hourOfDay: Int, minute: Int, tag: String) {
-
         val time = "${setTwoNumbersToTime(hourOfDay)}:${setTwoNumbersToTime(minute)}"
-
         when (tag) {
             "startTime" -> etStartTime.setText(time)
             "endTime" -> etEndTime.setText(time)

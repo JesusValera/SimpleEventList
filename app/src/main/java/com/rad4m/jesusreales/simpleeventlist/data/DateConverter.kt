@@ -3,14 +3,15 @@ package com.rad4m.jesusreales.simpleeventlist.data
 import android.arch.persistence.room.TypeConverter
 import java.util.*
 
-object Converters {
+object DateConverter {
+
     @TypeConverter
-    fun fromTimestamp(value: Long?): Date? {
+    fun toDate(value: Long?): Date? {
         return if (value == null) null else Date(value)
     }
 
     @TypeConverter
-    fun dateToTimestamp(date: Date?): Long? {
-        return (if (date == null) null else date.getTime())?.toLong()
+    fun toTimestamp(date: Date?): Long? {
+        return (if (date == null) null else date.time)
     }
 }
