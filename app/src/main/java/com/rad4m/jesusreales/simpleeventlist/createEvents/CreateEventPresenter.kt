@@ -1,20 +1,11 @@
 package com.rad4m.jesusreales.simpleeventlist.createEvents
 
-import android.view.View
-import com.rad4m.jesusreales.simpleeventlist.R
+import android.content.Context
+import com.rad4m.jesusreales.simpleeventlist.data.model.Event
 
-class CreateEventPresenter(private val mView: CreateEventContract.View) : CreateEventContract.Presenter, android.view.View.OnClickListener {
+class CreateEventPresenter(private val mView: CreateEventContract.View) : CreateEventContract.Presenter {
 
-    /// MODEL
-    //private var mModel: CreateEventContract.Model = CreateEventModel()
-
-    override fun onClick(view: View) {
-        when (view.id) {
-            R.id.fab -> {
-                //
-            }
-        }
-    }
+    private var mModel: CreateEventContract.Model = CreateEventModel()
 
     override fun start() {
 
@@ -24,5 +15,9 @@ class CreateEventPresenter(private val mView: CreateEventContract.View) : Create
         mView.initView()
     }
 
+    override fun updateOrInsertEvent(context: Context, event: Event) {
+        mModel.updateOrInsertEvent(context, event)
+        mView.finalizeActivity()
+    }
 
 }

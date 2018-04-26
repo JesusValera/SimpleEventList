@@ -6,12 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.rad4m.jesusreales.simpleeventlist.R
+import com.rad4m.jesusreales.simpleeventlist.base.BaseFragment
 import com.rad4m.jesusreales.simpleeventlist.data.model.CellElement
-import kotlin.collections.ArrayList
 
 class FutureEventsFragment : BaseFragment(), FragmentEventsContract.View {
-
-    override lateinit var mPresenter: FragmentEventsContract.Presenter
 
     companion object {
         fun newInstance(): FutureEventsFragment = FutureEventsFragment()
@@ -19,18 +17,17 @@ class FutureEventsFragment : BaseFragment(), FragmentEventsContract.View {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val mView = inflater.inflate(R.layout.fragment_with_events, container, false)
+        mView = inflater.inflate(R.layout.fragment_with_events, container, false)
 
         mRecyclerView = mView.findViewById(R.id.rvEvents)
         mRecyclerView.setHasFixedSize(true)
 
         mPresenter = FutureEventsPresenter(this)
-
-        recreateAdapter(mView)
+        mPresenter.filterEvents(mView)
 
         val swipeRefresh: SwipeRefreshLayout = mView.findViewById(R.id.swipe)
         swipeRefresh.setOnRefreshListener {
-            recreateAdapter(mView)
+            mPresenter.filterEvents(mView)
 
             if (swipeRefresh.isRefreshing) {
                 swipeRefresh.isRefreshing = false
@@ -41,7 +38,6 @@ class FutureEventsFragment : BaseFragment(), FragmentEventsContract.View {
     }
 
     override fun setEventsIntoRecyclerView(cellElements: ArrayList<CellElement>) {
-
+        recreateAdapter(mView, cellElements)
     }
-
 }

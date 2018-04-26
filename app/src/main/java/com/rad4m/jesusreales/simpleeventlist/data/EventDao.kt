@@ -6,11 +6,11 @@ import com.rad4m.jesusreales.simpleeventlist.data.model.Event
 @Dao
 interface EventDao {
 
-    @get:Query("SELECT * FROM event")
-    val all: ArrayList<Event>
+    @Query("SELECT * FROM event")
+    fun all(): List<Event>
 
-    @Query("SELECT * FROM event WHERE name = :name")
-    fun findByName(name: String)
+    @Query("SELECT * FROM event WHERE name LIKE :name LIMIT 1")
+    fun findByName(name: String): Event
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(event: Event)

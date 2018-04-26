@@ -1,22 +1,29 @@
 package com.rad4m.jesusreales.simpleeventlist.events.fragment
 
-import com.rad4m.jesusreales.simpleeventlist.BaseView
+import android.content.Context
+import com.rad4m.jesusreales.simpleeventlist.base.BaseView
 import com.rad4m.jesusreales.simpleeventlist.data.model.CellElement
-import com.rad4m.jesusreales.simpleeventlist.events.MainActivity
+import com.rad4m.jesusreales.simpleeventlist.data.model.Event
 
 interface FragmentEventsContract {
 
     interface View : BaseView<Presenter> {
+
+        fun start()
 
         fun setEventsIntoRecyclerView(cellElements : ArrayList<CellElement>)
     }
 
     interface Presenter {
 
-        fun filterEvents(activity : MainActivity) : ArrayList<CellElement> // Should not return the list. SQLite.
-                            // Do not pass any activity....!
-
-        //fun filterEvents() // The good one.
+        fun filterEvents(view: android.view.View)
 
     }
+
+    interface Model {
+
+        fun getEvents(context: Context) : List<Event>
+
+    }
+
 }

@@ -1,37 +1,34 @@
 package com.rad4m.jesusreales.simpleeventlist.events
 
-import android.app.Activity
 import android.app.DialogFragment
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.CalendarContract
 import android.view.*
 import com.rad4m.jesusreales.simpleeventlist.dialog.EventOptions
 import com.rad4m.jesusreales.simpleeventlist.data.model.Event
 import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.Toolbar
+import android.widget.Toast
 import com.rad4m.jesusreales.simpleeventlist.createEvents.CreateEvent
 import com.rad4m.jesusreales.simpleeventlist.R
 import com.rad4m.jesusreales.simpleeventlist.adapter.SampleAdapter
-import com.rad4m.jesusreales.simpleeventlist.data.CreateDemoEvents
-import com.rad4m.jesusreales.simpleeventlist.events.fragment.BaseFragment
+import com.rad4m.jesusreales.simpleeventlist.base.BaseFragment
+import com.rad4m.jesusreales.simpleeventlist.data.AppDatabase
 import com.rad4m.jesusreales.simpleeventlist.data.model.CellElement
+import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener, MainActivityContract.View {
 
     override lateinit var mPresenter: MainActivityContract.Presenter
-
-    val cellElements: ArrayList<CellElement> = ArrayList()
-    private lateinit var mViewPager: ViewPager
     private lateinit var mAdapter: SampleAdapter
-    private val INTENT_FOR_RESULT = 1
-    private val INTENT_FOR_RESULT_UPDATE = 2
 
-    override fun onResume() {
-        super.onResume()
-        mPresenter.start()
+    override fun start() {
+        val fragment = mAdapter.mCurrentFragment as BaseFragment
+        fragment.start()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,15 +39,24 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener, Main
         initToolbar()
 
         val tabLayout: TabLayout = findViewById(R.id.tab_layout)
-        mViewPager = findViewById(R.id.view_pager)
+        val mViewPager: ViewPager = findViewById(R.id.view_pager)
         mAdapter = SampleAdapter(supportFragmentManager)
 
         mViewPager.adapter = mAdapter
         tabLayout.setupWithViewPager(mViewPager)
 
-        CreateDemoEvents(applicationContext).createDemoEvents(cellElements)
-
         mPresenter = MainActivityPresenter(this)
+        //insertEvent()
+    }
+
+    private fun insertEvent() {
+        val event = Event()
+        event.name = "Guten Tag"
+        event.location = "Krakow"
+        event.date = Date(/*System.currentTimeMillis() - 1000 * 60 * 60 * 24*/)
+        event.startTime = "12:10"
+        event.endTime = "13:34"
+        AppDatabase.getDatabase(baseContext).eventDao.insert(event)
     }
 
     private fun initToolbar() {
@@ -67,72 +73,55 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener, Main
         when (item?.itemId) {
             R.id.menuCreateEvent -> {
                 val intent = Intent(this.applicationContext, CreateEvent::class.java)
-                mPresenter.createEventActivity(intent)
+                startActivity(intent)
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    /*override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            INTENT_FOR_RESULT -> {
-                if (resultCode == Activity.RESULT_OK && data != null) {
-                    // Insert event into SQLite.
-                    val pic = CreateDemoEvents(baseContext).getRandomPicture()
-                    mPresenter.createEventFromResult(data, pic)
-                }
-            }
-            INTENT_FOR_RESULT_UPDATE -> {
-                if (resultCode == Activity.RESULT_OK && data != null) {
-                    val pic = CreateDemoEvents(baseContext).getRandomPicture()
-                    mPresenter.createEventFromResultUpdate(data, pic)
-                }
-            }
-        }
-        mPresenter.updateCurrentFragment(mAdapter.mCurrentFragment as BaseFragment)
-        super.onActivityResult(requestCode, resultCode, data)
-    }*/
-
-    override fun addEventToEventList(event: Event) {
-        cellElements.add(CellElement(event))
-    }
-
-    override fun updateEventFromEventList(event: Event) {
-        // Search from array and replace. -- TODO Search from Room SQLite.
-        // --> mPresenter.loadEvents()
-        for (i in cellElements.indices) {
-            if (cellElements[i].event!!.name == event.name) {
-                // Set the same picture.
-                event.picture = cellElements[i].event?.picture!!
-                cellElements[i].event = event
-            }
-        }
-    }
-
     override fun onDialogDelete(dialog: DialogFragment, cellElement: CellElement) {
-        mPresenter.deleteEvent(cellElements, cellElement)
-        mPresenter.updateCurrentFragment(mAdapter.mCurrentFragment as BaseFragment)
+        mPresenter.deleteEvent(baseContext, cellElement.event!!)
     }
 
     override fun onDialogAddToCalendar(dialog: DialogFragment, cellElement: CellElement) {
-        mPresenter.addEventToCalendar(cellElement.event!!)
-    }
+        val event = cellElement.event!!
+        val beginDate = returnCompleteDate(event, event.startTime!!)
+        val endDate = returnCompleteDate(event, event.endTime!!)
 
-    override fun onDialogUpdate(dialog: DialogFragment, cellElement: CellElement) {
-        val intent = Intent(applicationContext, CreateEvent::class.java)
-        mPresenter.updateEvent(cellElement.event!!, intent)
-    }
+        val intent = Intent(Intent.ACTION_INSERT)
+        intent.data = CalendarContract.Events.CONTENT_URI
+        intent.putExtra(CalendarContract.Events.TITLE, event.name)
+        intent.putExtra(CalendarContract.Events.EVENT_LOCATION, event.location)
+        intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginDate.timeInMillis)
+        intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endDate.timeInMillis)
 
-    override fun startEventCalendar(intent: Intent) {
         startActivity(intent)
     }
 
-    override fun startUpdateEvent(intent: Intent) {
-        startActivityForResult(intent, INTENT_FOR_RESULT_UPDATE)
+    private fun returnCompleteDate(event: Event, time: String): Calendar {
+        val date = event.date
+        val hours = time.subSequence(0, 2).toString().toInt()
+        val minutes = time.subSequence(3, 5).toString().toInt()
+
+        val cal: Calendar = Calendar.getInstance()
+        cal.time = date
+        cal.add(Calendar.HOUR, hours)
+        cal.add(Calendar.MINUTE, minutes)
+
+        return cal
     }
 
-    override fun startCreateEvent(intent: Intent) {
-        startActivityForResult(intent, INTENT_FOR_RESULT)
+    override fun onDialogUpdate(dialog: DialogFragment, cellElement: CellElement) {
+        val intent = Intent(this, CreateEvent::class.java)
+        val event: Event = cellElement.event!!
+        intent.putExtra("name", event.name)
+        intent.putExtra("location", event.location)
+        intent.putExtra("startTime", event.startTime)
+        intent.putExtra("endTime", event.endTime)
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val dateformat = sdf.format(event.date)
+        intent.putExtra("date", dateformat)
+        startActivity(intent)
     }
+
 }
-

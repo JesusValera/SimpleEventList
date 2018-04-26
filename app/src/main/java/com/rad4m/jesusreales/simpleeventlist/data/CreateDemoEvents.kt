@@ -8,14 +8,13 @@ import java.util.*
 
 class CreateDemoEvents(val context: Context) {
 
-    private val pictures = arrayListOf(R.drawable.comp0, R.drawable.comp1, R.drawable.comp2, R.drawable.comp3)
+
 
     fun createDemoEvents(cellElements : ArrayList<CellElement>) {
         val dates = createDates()
         for (i in 1..5) {
             val event = Event()
-            event.name = "Event n${i}"
-            event.picture = getRandomPicture()
+            event.name = "Event n$i"
             event.date = dates[i - 1]
             event.startTime = "10:00"
             event.endTime = "13:30"
@@ -34,9 +33,4 @@ class CreateDemoEvents(val context: Context) {
         return listOf(date, date2, date2, date3, date4)
     }
 
-    private fun random(n: Int) = (Math.random() * n).toInt()
-
-    fun getRandomPicture() : Int {
-        return pictures[random(4)]
-    }
 }

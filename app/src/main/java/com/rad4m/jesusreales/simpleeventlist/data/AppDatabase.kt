@@ -31,6 +31,7 @@ abstract class AppDatabase : RoomDatabase() {
                     if (INSTANCE == null)
                         INSTANCE = Room.databaseBuilder(context.applicationContext,
                                 AppDatabase::class.java, "events.db")
+                                .allowMainThreadQueries()
                                 .build()
                 }
 

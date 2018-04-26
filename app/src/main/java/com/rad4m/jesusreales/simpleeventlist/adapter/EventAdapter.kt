@@ -16,7 +16,7 @@ import android.net.Uri
 import android.support.v4.content.res.ResourcesCompat
 import com.rad4m.jesusreales.simpleeventlist.data.model.CellElement
 
-class EventAdapter(var context: Context, cellElements: ArrayList<CellElement>) : RecyclerView.Adapter<EventAdapter.EventsViewHolder>(), View.OnLongClickListener {
+class EventAdapter(var context: Context, cellElements: List<CellElement>) : RecyclerView.Adapter<EventAdapter.EventsViewHolder>(), View.OnLongClickListener {
 
     private lateinit var cellElements: List<CellElement>
     private lateinit var listener: View.OnLongClickListener
@@ -25,7 +25,7 @@ class EventAdapter(var context: Context, cellElements: ArrayList<CellElement>) :
         createDividers(cellElements)
     }
 
-    private fun createDividers(cellElements: ArrayList<CellElement>) {
+    private fun createDividers(cellElements: List<CellElement>) {
         val cellEventsAndDividers: ArrayList<CellElement> = arrayListOf()
 
         for (i in cellElements.indices) {

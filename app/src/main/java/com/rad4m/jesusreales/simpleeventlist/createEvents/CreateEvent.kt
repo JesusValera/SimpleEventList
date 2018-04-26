@@ -1,16 +1,18 @@
 package com.rad4m.jesusreales.simpleeventlist.createEvents
 
-import android.app.Activity
 import android.app.DialogFragment
-import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.EditText
 import android.widget.Toast
 import com.rad4m.jesusreales.simpleeventlist.R
+import com.rad4m.jesusreales.simpleeventlist.data.model.Event
 import com.rad4m.jesusreales.simpleeventlist.dialog.DatePickerFragment
 import com.rad4m.jesusreales.simpleeventlist.dialog.TimePickerFragment
+
 import kotlinx.android.synthetic.main.activity_create_event.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class CreateEvent : AppCompatActivity(), DatePickerFragment.DateDialogListener, TimePickerFragment.DateDialogListener, CreateEventContract.View {
 
@@ -33,29 +35,31 @@ class CreateEvent : AppCompatActivity(), DatePickerFragment.DateDialogListener, 
         listeners()
 
         fab.setOnClickListener {
-            // Create an Event and save into SQL. Not with setResult.
-            //mPresenter.onClick(it)
-
             val name = etName.text.toString()
             val date = etDate.text.toString()
             val startTime = etStartTime.text.toString()
             val endTime = etEndTime.text.toString()
+            val location = etLocation.text.toString()
 
             if (name == "" || date == "" || startTime == "" || endTime == "") {
                 Toast.makeText(this, "Only location can be empty", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val intent = Intent()
-            intent.putExtra("name", name)
-            intent.putExtra("date", date)
-            intent.putExtra("startTime", startTime)
-            intent.putExtra("endTime", endTime)
-            intent.putExtra("location", etLocation.text.toString())
+            val event = Event()
+            event.name = name
+            event.startTime = startTime
+            event.endTime = endTime
+            event.location = location
+            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            event.date = sdf.parse(date)
 
-            setResult(Activity.RESULT_OK, intent)
-            finish()
+            mPresenter.updateOrInsertEvent(applicationContext, event)
         }
+    }
+
+    override fun finalizeActivity() {
+        finish()
     }
 
     override fun initView() {

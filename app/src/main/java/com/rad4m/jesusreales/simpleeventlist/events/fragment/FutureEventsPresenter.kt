@@ -1,19 +1,24 @@
 package com.rad4m.jesusreales.simpleeventlist.events.fragment
 
 import android.text.format.DateUtils
+import android.view.View
 import com.rad4m.jesusreales.simpleeventlist.data.model.CellElement
+import com.rad4m.jesusreales.simpleeventlist.data.model.Event
 import com.rad4m.jesusreales.simpleeventlist.events.MainActivity
 import java.util.*
 
 class FutureEventsPresenter(val baseFragment: FragmentEventsContract.View) : FragmentEventsContract.Presenter {
 
+    private val mModel: FragmentEventModel = FragmentEventModel()
+
     init {
         baseFragment.mPresenter = this
     }
 
-    override fun filterEvents(activity: MainActivity): ArrayList<CellElement> {
+    override fun filterEvents(view: View) {
+        val events = mModel.getEvents(view.context)
+        val cells = eventToCellEvent(events)
         val cellFilter = arrayListOf<CellElement>()
-        val cells = activity.cellElements
         cells.sort()
 
         for (i in cells.indices) {
@@ -26,7 +31,16 @@ class FutureEventsPresenter(val baseFragment: FragmentEventsContract.View) : Fra
             }
         }
 
-        //baseFragment.setEventsIntoRecyclerView(cellFilter)
+        baseFragment.setEventsIntoRecyclerView(cellFilter)
+    }
+
+    private fun eventToCellEvent(events: List<Event>) : ArrayList<CellElement> {
+        val cellFilter = arrayListOf<CellElement>()
+        for (i in events) {
+            val cell = CellElement(i)
+            cellFilter.add(cell)
+        }
+
         return cellFilter
     }
 
