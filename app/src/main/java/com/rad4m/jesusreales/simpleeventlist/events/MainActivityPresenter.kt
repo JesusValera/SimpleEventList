@@ -14,4 +14,7 @@ class MainActivityPresenter(private val mView: MainActivityContract.View): MainA
         mView.start()
     }
 
+    override fun activityCreateEvent() {
+        mView.startActivityCreateEvent()
+    }
 }

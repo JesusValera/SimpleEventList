@@ -7,9 +7,7 @@ class CreateEventPresenter(private val mView: CreateEventContract.View) : Create
 
     private var mModel: CreateEventContract.Model = CreateEventModel()
 
-    override fun start() {
-
-    }
+    override fun start() {}
 
     init {
         mView.initView()

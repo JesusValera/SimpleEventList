@@ -9,12 +9,17 @@ import com.rad4m.jesusreales.simpleeventlist.data.model.Event
 interface MainActivityContract {
 
     interface View : BaseView<Presenter> {
+
         fun start()
+
+        fun startActivityCreateEvent()
     }
 
     interface Presenter : BasePresenter {
 
         fun deleteEvent(context: Context, event: Event)
+
+        fun activityCreateEvent()
 
     }
 

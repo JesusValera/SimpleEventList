@@ -8,18 +8,15 @@ import android.provider.CalendarContract
 import android.view.*
 import com.rad4m.jesusreales.simpleeventlist.dialog.EventOptions
 import com.rad4m.jesusreales.simpleeventlist.data.model.Event
-import android.support.design.widget.TabLayout
-import android.support.v4.view.ViewPager
 import android.support.v7.widget.Toolbar
-import android.widget.Toast
 import com.rad4m.jesusreales.simpleeventlist.createEvents.CreateEvent
 import com.rad4m.jesusreales.simpleeventlist.R
 import com.rad4m.jesusreales.simpleeventlist.adapter.SampleAdapter
 import com.rad4m.jesusreales.simpleeventlist.base.BaseFragment
-import com.rad4m.jesusreales.simpleeventlist.data.AppDatabase
 import com.rad4m.jesusreales.simpleeventlist.data.model.CellElement
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener, MainActivityContract.View {
 
@@ -33,17 +30,12 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener, Main
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_main)
-
         initToolbar()
 
-        val tabLayout: TabLayout = findViewById(R.id.tab_layout)
-        val mViewPager: ViewPager = findViewById(R.id.view_pager)
         mAdapter = SampleAdapter(supportFragmentManager)
-
-        mViewPager.adapter = mAdapter
-        tabLayout.setupWithViewPager(mViewPager)
+        view_pager.adapter = mAdapter
+        tab_layout.setupWithViewPager(view_pager)
 
         mPresenter = MainActivityPresenter(this)
         //insertEvent()
@@ -56,7 +48,7 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener, Main
         event.date = Date(/*System.currentTimeMillis() - 1000 * 60 * 60 * 24*/)
         event.startTime = "12:10"
         event.endTime = "13:34"
-        AppDatabase.getDatabase(baseContext).eventDao.insert(event)
+        //AppDatabase.getDatabase(baseContext).eventDao.insert(event)
     }
 
     private fun initToolbar() {
@@ -72,11 +64,15 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener, Main
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.menuCreateEvent -> {
-                val intent = Intent(this.applicationContext, CreateEvent::class.java)
-                startActivity(intent)
+                mPresenter.activityCreateEvent()
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun startActivityCreateEvent() {
+        val intent = Intent(this.applicationContext, CreateEvent::class.java)
+        startActivity(intent)
     }
 
     override fun onDialogDelete(dialog: DialogFragment, cellElement: CellElement) {

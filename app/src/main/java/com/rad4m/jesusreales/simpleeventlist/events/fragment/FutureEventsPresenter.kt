@@ -4,7 +4,6 @@ import android.text.format.DateUtils
 import android.view.View
 import com.rad4m.jesusreales.simpleeventlist.data.model.CellElement
 import com.rad4m.jesusreales.simpleeventlist.data.model.Event
-import com.rad4m.jesusreales.simpleeventlist.events.MainActivity
 import java.util.*
 
 class FutureEventsPresenter(val baseFragment: FragmentEventsContract.View) : FragmentEventsContract.Presenter {
@@ -34,7 +33,7 @@ class FutureEventsPresenter(val baseFragment: FragmentEventsContract.View) : Fra
         baseFragment.setEventsIntoRecyclerView(cellFilter)
     }
 
-    private fun eventToCellEvent(events: List<Event>) : ArrayList<CellElement> {
+    private fun eventToCellEvent(events: List<Event>): ArrayList<CellElement> {
         val cellFilter = arrayListOf<CellElement>()
         for (i in events) {
             val cell = CellElement(i)

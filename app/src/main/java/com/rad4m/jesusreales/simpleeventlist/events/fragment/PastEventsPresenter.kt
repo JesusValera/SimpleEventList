@@ -34,7 +34,7 @@ class PastEventsPresenter(val baseFragment: FragmentEventsContract.View) : Fragm
         baseFragment.setEventsIntoRecyclerView(cellFilter)
     }
 
-    private fun eventToCellEvent(events: List<Event>) : ArrayList<CellElement> {
+    private fun eventToCellEvent(events: List<Event>): ArrayList<CellElement> {
         val cellFilter = arrayListOf<CellElement>()
         for (i in events) {
             val cell = CellElement(i)

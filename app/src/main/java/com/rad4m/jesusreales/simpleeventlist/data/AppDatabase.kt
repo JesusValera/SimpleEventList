@@ -12,10 +12,10 @@ import com.rad4m.jesusreales.simpleeventlist.data.model.Event
 abstract class AppDatabase : RoomDatabase() {
 
     abstract val eventDao: EventDao
-    //abstract fun eventDao(): EventDao
 
     companion object {
 
+        @Volatile
         private var INSTANCE: AppDatabase? = null
 
         /**
@@ -24,20 +24,15 @@ abstract class AppDatabase : RoomDatabase() {
          * @param context The context.
          * @return The singleton instance of WordDatabase.
          */
-        @Synchronized
-        fun getDatabase(context: Context): AppDatabase {
-            if (INSTANCE == null) {
-                synchronized(AppDatabase::class) {
-                    if (INSTANCE == null)
-                        INSTANCE = Room.databaseBuilder(context.applicationContext,
-                                AppDatabase::class.java, "events.db")
-                                .allowMainThreadQueries()
-                                .build()
+        fun getDatabase(context: Context): AppDatabase =
+                INSTANCE ?: synchronized(this) {
+                    INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
                 }
 
-            }
-            return INSTANCE!!
-        }
+        private fun buildDatabase(context: Context) =
+                Room.databaseBuilder(context.applicationContext,
+                        AppDatabase::class.java, "events.db")
+                        .allowMainThreadQueries()
+                        .build()
     }
-
 }
