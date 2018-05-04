@@ -1,4 +1,4 @@
-package com.rad4m.jesusreales.simpleeventlist.dialog
+package com.rad4m.jesusreales.simpleeventlist.ui.dialogs
 
 import android.app.DatePickerDialog
 import android.app.Dialog
@@ -6,7 +6,6 @@ import android.app.DialogFragment
 import android.os.Bundle
 import android.widget.DatePicker
 import java.util.*
-import android.app.Activity
 import android.content.Context
 
 class DatePickerFragment : DialogFragment(), DatePickerDialog.OnDateSetListener {

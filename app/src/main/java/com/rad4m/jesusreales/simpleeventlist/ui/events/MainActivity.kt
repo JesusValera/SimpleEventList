@@ -1,19 +1,25 @@
-package com.rad4m.jesusreales.simpleeventlist.events
+package com.rad4m.jesusreales.simpleeventlist.ui.events
 
 import android.app.DialogFragment
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.CalendarContract
 import android.view.*
-import com.rad4m.jesusreales.simpleeventlist.dialog.EventOptions
+import com.rad4m.jesusreales.simpleeventlist.ui.dialogs.EventOptions
 import com.rad4m.jesusreales.simpleeventlist.data.model.Event
 import android.support.v7.widget.Toolbar
-import com.rad4m.jesusreales.simpleeventlist.createEvents.CreateEvent
+import android.util.Log
+import com.rad4m.jesusreales.simpleeventlist.di.EventViewModel
+import com.rad4m.jesusreales.simpleeventlist.di.Injection
+import com.rad4m.jesusreales.simpleeventlist.ui.createEvents.CreateEvent
 import com.rad4m.jesusreales.simpleeventlist.R
-import com.rad4m.jesusreales.simpleeventlist.adapter.SampleAdapter
-import com.rad4m.jesusreales.simpleeventlist.base.BaseFragment
+import com.rad4m.jesusreales.simpleeventlist.ui.adapters.SampleAdapter
 import com.rad4m.jesusreales.simpleeventlist.data.model.CellElement
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlinx.android.synthetic.main.activity_main.*
@@ -22,10 +28,19 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener, Main
 
     override lateinit var mPresenter: MainActivityContract.Presenter
     private lateinit var mAdapter: SampleAdapter
+    private lateinit var viewModel: EventViewModel
+    private val disposable = CompositeDisposable()
 
-    override fun start() {
-        val fragment = mAdapter.mCurrentFragment as BaseFragment
-        fragment.start()
+    override fun onStart() {
+        super.onStart()
+        val viewModelFactory = Injection.provideViewModelFactory(applicationContext)
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(EventViewModel::class.java)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        disposable.clear()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,17 +53,6 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener, Main
         tab_layout.setupWithViewPager(view_pager)
 
         mPresenter = MainActivityPresenter(this)
-        //insertEvent()
-    }
-
-    private fun insertEvent() {
-        val event = Event()
-        event.name = "Guten Tag"
-        event.location = "Krakow"
-        event.date = Date(/*System.currentTimeMillis() - 1000 * 60 * 60 * 24*/)
-        event.startTime = "12:10"
-        event.endTime = "13:34"
-        //AppDatabase.getDatabase(baseContext).eventDao.insert(event)
     }
 
     private fun initToolbar() {
@@ -76,7 +80,11 @@ class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener, Main
     }
 
     override fun onDialogDelete(dialog: DialogFragment, cellElement: CellElement) {
-        mPresenter.deleteEvent(baseContext, cellElement.event!!)
+        disposable.add(viewModel.deleteEvent(cellElement.event!!)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({},
+                        { error -> Log.e("ERROR SUBS", "Unable to delete event.", error) }))
     }
 
     override fun onDialogAddToCalendar(dialog: DialogFragment, cellElement: CellElement) {

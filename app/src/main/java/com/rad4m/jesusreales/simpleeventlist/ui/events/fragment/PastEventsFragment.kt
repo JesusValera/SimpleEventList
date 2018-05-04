@@ -1,18 +1,17 @@
-package com.rad4m.jesusreales.simpleeventlist.events.fragment
+package com.rad4m.jesusreales.simpleeventlist.ui.events.fragment
 
 import android.os.Bundle
-import android.support.v4.widget.SwipeRefreshLayout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.rad4m.jesusreales.simpleeventlist.R
-import com.rad4m.jesusreales.simpleeventlist.base.BaseFragment
+import com.rad4m.jesusreales.simpleeventlist.ui.BaseFragment
 import com.rad4m.jesusreales.simpleeventlist.data.model.CellElement
 
-class FutureEventsFragment : BaseFragment(), FragmentEventsContract.View {
+class PastEventsFragment : BaseFragment(), FragmentEventsContract.View {
 
     companion object {
-        fun newInstance(): FutureEventsFragment = FutureEventsFragment()
+        fun newInstance(): PastEventsFragment = PastEventsFragment()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -22,17 +21,7 @@ class FutureEventsFragment : BaseFragment(), FragmentEventsContract.View {
         mRecyclerView = mView.findViewById(R.id.rvEvents)
         mRecyclerView.setHasFixedSize(true)
 
-        mPresenter = FutureEventsPresenter(this)
-        mPresenter.filterEvents(mView)
-
-        val swipeRefresh: SwipeRefreshLayout = mView.findViewById(R.id.swipe)
-        swipeRefresh.setOnRefreshListener {
-            mPresenter.filterEvents(mView)
-
-            if (swipeRefresh.isRefreshing) {
-                swipeRefresh.isRefreshing = false
-            }
-        }
+        mPresenter = PastEventsPresenter(this)
 
         return mView
     }
@@ -40,4 +29,6 @@ class FutureEventsFragment : BaseFragment(), FragmentEventsContract.View {
     override fun setEventsIntoRecyclerView(cellElements: ArrayList<CellElement>) {
         recreateAdapter(mView, cellElements)
     }
+
+    override fun start() { }
 }

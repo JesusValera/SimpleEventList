@@ -2,7 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android" >
     <item
         android:id="@+id/menuCreateEvent"
-        android:icon="@drawable/ic_add_alert_white_24dp"
+        android:icon="@drawable/ic_event_18dp"
         android:title="@string/create_event"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 </menu>

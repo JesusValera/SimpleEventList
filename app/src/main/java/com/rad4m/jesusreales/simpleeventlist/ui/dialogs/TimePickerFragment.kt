@@ -1,6 +1,5 @@
-package com.rad4m.jesusreales.simpleeventlist.dialog
+package com.rad4m.jesusreales.simpleeventlist.ui.dialogs
 
-import android.app.Activity
 import android.app.Dialog
 import android.app.DialogFragment
 import android.app.TimePickerDialog

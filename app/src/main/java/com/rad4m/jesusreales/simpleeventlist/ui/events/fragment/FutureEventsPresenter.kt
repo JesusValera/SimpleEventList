@@ -1,4 +1,4 @@
-package com.rad4m.jesusreales.simpleeventlist.events.fragment
+package com.rad4m.jesusreales.simpleeventlist.ui.events.fragment
 
 import android.text.format.DateUtils
 import android.view.View
@@ -8,14 +8,11 @@ import java.util.*
 
 class FutureEventsPresenter(val baseFragment: FragmentEventsContract.View) : FragmentEventsContract.Presenter {
 
-    private val mModel: FragmentEventModel = FragmentEventModel()
-
     init {
         baseFragment.mPresenter = this
     }
 
-    override fun filterEvents(view: View) {
-        val events = mModel.getEvents(view.context)
+    override fun filterEvents(view: View, events: List<Event>) {
         val cells = eventToCellEvent(events)
         val cellFilter = arrayListOf<CellElement>()
         cells.sort()

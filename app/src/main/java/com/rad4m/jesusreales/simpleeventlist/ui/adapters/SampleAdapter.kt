@@ -1,11 +1,11 @@
-package com.rad4m.jesusreales.simpleeventlist.adapter
+package com.rad4m.jesusreales.simpleeventlist.ui.adapters
 
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.view.ViewGroup
-import com.rad4m.jesusreales.simpleeventlist.events.fragment.FutureEventsFragment
-import com.rad4m.jesusreales.simpleeventlist.events.fragment.PastEventsFragment
+import com.rad4m.jesusreales.simpleeventlist.ui.events.fragment.FutureEventsFragment
+import com.rad4m.jesusreales.simpleeventlist.ui.events.fragment.PastEventsFragment
 
 class SampleAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 

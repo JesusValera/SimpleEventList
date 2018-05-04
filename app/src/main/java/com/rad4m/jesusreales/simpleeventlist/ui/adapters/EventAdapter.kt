@@ -1,4 +1,4 @@
-package com.rad4m.jesusreales.simpleeventlist.adapter
+package com.rad4m.jesusreales.simpleeventlist.ui.adapters
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView

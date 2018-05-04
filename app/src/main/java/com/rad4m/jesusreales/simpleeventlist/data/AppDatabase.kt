@@ -24,7 +24,7 @@ abstract class AppDatabase : RoomDatabase() {
          * @param context The context.
          * @return The singleton instance of WordDatabase.
          */
-        fun getDatabase(context: Context): AppDatabase =
+        fun getInstance(context: Context): AppDatabase =
                 INSTANCE ?: synchronized(this) {
                     INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
                 }
@@ -32,7 +32,6 @@ abstract class AppDatabase : RoomDatabase() {
         private fun buildDatabase(context: Context) =
                 Room.databaseBuilder(context.applicationContext,
                         AppDatabase::class.java, "events.db")
-                        .allowMainThreadQueries()
                         .build()
     }
 }
