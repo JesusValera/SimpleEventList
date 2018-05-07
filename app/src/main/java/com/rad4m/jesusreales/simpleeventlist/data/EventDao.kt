@@ -14,7 +14,7 @@ interface EventDao {
     fun findByName(name: String): Flowable<Event>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(event: Event)
+    fun insertOrUpdate(event: Event)
 
     @Delete
     fun delete(event: Event)

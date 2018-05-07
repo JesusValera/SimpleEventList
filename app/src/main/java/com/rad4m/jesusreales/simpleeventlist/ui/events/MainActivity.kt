@@ -6,7 +6,8 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.CalendarContract
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
 import com.rad4m.jesusreales.simpleeventlist.ui.dialogs.EventOptions
 import com.rad4m.jesusreales.simpleeventlist.data.model.Event
 import android.support.v7.widget.Toolbar
@@ -21,7 +22,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), EventOptions.DialogEventListener, MainActivityContract.View {

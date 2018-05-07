@@ -105,7 +105,6 @@ class EventAdapter(var context: Context, cellElements: List<CellElement>) : Recy
     override fun onBindViewHolder(holder: EventsViewHolder, position: Int) {
         val event: CellElement = cellElements[position]
 
-
         holder.bindEvent(event)
     }
 

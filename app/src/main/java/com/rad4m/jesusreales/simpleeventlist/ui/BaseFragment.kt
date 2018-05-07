@@ -38,7 +38,7 @@ abstract class BaseFragment : Fragment(), FragmentEventsContract.View {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({mPresenter.filterEvents(view!!, it)},
-                        { error -> Log.e("ERROR SUBS", "Unable to get users.", error) }))
+                        { error -> Log.e("ERROR SUBS", "Unable to get events.", error) }))
     }
 
     override fun onDestroy() {

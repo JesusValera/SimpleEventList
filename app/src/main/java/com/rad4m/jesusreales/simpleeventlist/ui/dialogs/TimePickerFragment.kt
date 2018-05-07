@@ -36,7 +36,7 @@ class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSetListener 
             mListener = activity as DateDialogListener
         } catch (e: ClassCastException) {
             // The activity doesn't implement the interface, throw exception
-            throw ClassCastException(activity.toString() + " must implement NoticeDialogListener")
+            throw ClassCastException(activity.toString() + " must implement DateDialogListener")
         }
     }
 

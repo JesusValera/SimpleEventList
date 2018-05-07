@@ -118,7 +118,7 @@ class CreateEvent : AppCompatActivity(), DatePickerFragment.DateDialogListener,
             val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             event.date = sdf.parse(date)
 
-            disposable.add(viewModel.insertEvent(event)
+            disposable.add(viewModel.insertOrUpdateEvent(event)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ finish() },
